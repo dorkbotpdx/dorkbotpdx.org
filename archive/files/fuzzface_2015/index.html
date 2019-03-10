@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="three.min.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Oswald:700|Patua+One' rel='stylesheet' type='text/css'>
+
+    <style>
+      body { margin: 0; color: #110011; max-width: 480px; font-family: 'Patua One', cursive; font-size: 16px; 	background: #e4e9fd; }
+      canvas { position: absolute; top: 314px; left: 0px; z-index: -1; }
+      h1 {
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 35px;
+        font-weight: 700;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        letter-spacing: 1px;
+        color: #110011;
+      }
+      h2 {
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        margin-top: 2px;
+        letter-spacing: 2.5px;
+      }
+      #dorkbotpdx {
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 12px;
+        letter-spacing: 10px;
+        padding: 0px;
+        color: #9999DD;
+        margin-top: 5px;
+      }
+      #detail-description {
+        margin-left: 25px;
+        margin-right: 25px;
+      }
+      #details-list {
+ /*        position: absolute;
+        top: 410px; */
+        padding-left: 10px;
+        padding-right: 10px;
+        font-size: 18px;
+      }
+      #left-details {
+        float: left;
+      }
+      #right-details {
+        float: right;
+        text-align: right;
+      }
+      #date {
+        font-size: 18px;
+      }
+
+    </style>
+
+<script type="x-shader/x-vertex" id="vertexShader">
+      // switch on high precision floats
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      varying vec2 texCoord;
+
+      void main()
+      {
+        texCoord = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+      }
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentShader">
+			uniform float iGlobalTime;
+			uniform vec2 iResolution;
+			uniform sampler2D iChannel0;
+			uniform vec2 smoothAmounts;
+			varying vec2 texCoord;
+
+			float get_intensity(vec2 uv) {
+      	float val = texture2D(iChannel0, texCoord).r;
+      	float dis = abs(val - uv.y);
+      	return dis;
+			}
+
+      void main()
+      {
+      	float intensity = get_intensity(texCoord);
+      	intensity = smoothstep(smoothAmounts.x, smoothAmounts.y, intensity);
+
+      	intensity = 1.0 - intensity;
+        gl_FragColor = vec4(intensity, intensity, intensity, intensity);
+      }
+</script>
+
+<script type="text/javascript">
+	var scene, renderer, camera;
+	var start_time, facadeMaterial, catArm;
+	var dummyDataTex;
+	var textures = [];
+	var gui;
+
+	function loadTextures() {
+		console.log("loadTextures");
+		var texture_names = ["background.jpg", "cat.png", "guitar.png", "cat_arm.png"],
+			i,
+			loader;
+		for (i = 0; i < texture_names.length; i++) {
+			textures.push(null);
+			loader = new THREE.TextureLoader();
+			loader.load("img/" + texture_names[i], function(idx) {
+				return function(texture) {
+					console.log(idx + " " + texture);
+					var j;
+					textures[idx] = texture;
+					texture.minFilter = THREE.LinearFilter;
+					for (j = 0; j < textures.length; j++) {
+						if (textures[j] == null)
+							return;
+					}
+					initThreeJS();
+				}
+			}(i));
+		}
+	}
+
+	function initThreeJS() {
+	  start_time = Date.now();
+	  scene = new THREE.Scene();
+
+	  console.log(window.innerWidth);
+	  console.log(window.innerHeight);
+
+	  var canvas_width = 480; //window.innerWidth;
+	  var canvas_height = 480; //window.innerHeight;
+
+	  var w2 = canvas_width / 2;
+	  var h2 = canvas_height / 2;
+	  camera = new THREE.OrthographicCamera(-w2, w2, h2, -h2, 1, 100);
+	  camera.position.z = 1;
+
+
+	  facadeMaterial = new THREE.ShaderMaterial( {
+	  	transparent: true,
+	    vertexShader: document.getElementById( 'vertexShader' ).textContent,
+	    fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+	    uniforms: {
+	      iResolution: { type: "2f", value: [canvas_width, canvas_height]},
+	      iGlobalTime: { type: "f", value: 0 },
+	      iChannel0: { type: "t", value: null },
+	      smoothAmounts: { type: "2f", value: [0.1, 0.15]},
+	      offset: { type: "2f", value: [0.0, -0.25] }
+	    },
+	  } );
+
+		var dummyRGBA = new Uint8Array(1024);
+    var offset = Math.random() * 16;
+		for(var i=0; i< 1024; i++){
+		  // RGB from 0 to 255
+      t = i + offset;
+		  dummyRGBA[i] = (Math.sin(t / 10) * (13 * Math.sin(t / 15))) + 128.0 ;
+		}
+		dummyDataTex = new THREE.DataTexture( dummyRGBA, 1024, 1, THREE.LuminanceFormat );
+		dummyDataTex.needsUpdate = true;
+		facadeMaterial.uniforms.iChannel0.value = dummyDataTex;
+
+		//
+	  var geom = new THREE.PlaneGeometry(w2*2,h2*2);
+	  var backgroundMaterial = new THREE.MeshBasicMaterial({ map: textures[0] });
+	  var back = new THREE.Mesh(geom, backgroundMaterial);
+	  back.position.z = -10.0;
+	  scene.add(back);
+
+	  // Cat
+	  var catMaterial = new THREE.MeshBasicMaterial({ map: textures[1], transparent : true });
+	  var cat = new THREE.Mesh(geom, catMaterial);
+	  cat.position.z = -9.0;
+	  cat.position.x = w2 * 0.6;
+	  cat.position.y = -h2 * 0.5;
+    cat.scale.x = 0.5;
+    cat.scale.y = 0.5;
+	  scene.add(cat);
+
+	  // Guitar
+	  var guitarMaterial = new THREE.MeshBasicMaterial({ map: textures[2], transparent : true });
+	  var guitar = new THREE.Mesh(geom, guitarMaterial);
+	  guitar.position.z = -9.0;
+	  guitar.position.x = 139;
+	  guitar.position.y = -167;
+	  guitar.rotation.z = -0.13;
+	  guitar.scale.x = 0.36;
+    guitar.scale.y = 0.25;
+	  scene.add(guitar);
+
+	  // CAT ARM
+	  var catArmMaterial = new THREE.MeshBasicMaterial({ map: textures[3], transparent : true });
+	  catArm = new THREE.Mesh(geom, catArmMaterial);
+	  catArm.position.z = -8.0;
+	  catArm.position.x = 192;
+	  catArm.position.y = -141;
+	  catArm.rotation.z = -0.13;
+	  catArm.scale.x = 0.08;
+    catArm.scale.y = 0.17;
+	  scene.add(catArm);
+
+		// Laserwaveform!
+	  var obj = new THREE.Mesh(geom, facadeMaterial);
+	  obj.position.z = -1.5;
+	  obj.position.x = -105;
+	  obj.position.y = -136.0;
+	  obj.rotation.z = -0.13;
+	  obj.scale.x = 0.7;
+    obj.scale.y = 0.5;
+		scene.add(obj);
+
+	  renderer = new THREE.WebGLRenderer();
+	  renderer.setSize(canvas_width, canvas_height);
+	  document.body.appendChild( renderer.domElement );
+	  render();
+	}
+
+	var nextToggle = 0;
+  var nextAnim = 0;
+
+	function render() {
+		var t = (Date.now() - start_time) / 1000.0;
+		if (t > nextToggle) {
+			toggleDistortion();
+			nextToggle = t + 5;
+		}
+    if (!audioContext) {
+      if (t > nextAnim) {
+        nextAnim = t + 0.03;
+        var offset = Math.random() * 160;
+        var vert = (Math.random() * 6) + 7;
+        for(var i=0; i< 1024; i++){
+          // RGB from 0 to 255
+          t = i + offset;
+          dummyDataTex.image.data[i] = (Math.sin(t / 10) * (vert * Math.sin(i / 15))) + 128.0 ;
+        }
+        dummyDataTex.needsUpdate = true;
+      }
+    }
+	  facadeMaterial.uniforms.iGlobalTime.value = t;
+	  if (distortionLevel > 0) {
+	  	facadeMaterial.uniforms.smoothAmounts.value = [0.1, 0.15];
+	  } else {
+	  	facadeMaterial.uniforms.smoothAmounts.value = [0.01, 0.015];
+	  }
+	  catArm.rotation.z = (-0.33 * 0.5) * Math.sin(t*25.0) - (-0.33 * 0.5);
+	  requestAnimationFrame( render );
+	  renderer.render( scene, camera );
+	}
+
+$(function() {
+  loadTextures();
+});
+// window.onload = function() {
+//   // gui = new dat.GUI();
+//   // console.log(gui);
+//   loadTextures();
+// }
+	//
+	// AUDIO!
+	//
+// Hacks to deal with different function names in different browsers
+window.requestAnimFrame = (function() {
+  return window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    function(callback, element) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+})();
+
+window.AudioContext = (function() {
+  return window.AudioContext || window.mozAudioContext;
+})();
+
+// Global Variables for Audio
+var audioContext;
+var sourceNode;
+var analyserNode;
+var javascriptNode;
+var sampleSize = 1024; // Every 1024 audio samples, the Analyser node triggers the Javascript node, which calls our graphics function that renders it.
+var array; // array to hold time domain data
+var audioBuffer;
+
+var audioData = null;
+var audioPlaying = false;
+var audioUrl;
+
+var distortion;
+var distortionLevel = 0;
+
+$(function() {
+  // the AudioContext is the primary 'container' for all your audio node objects
+  try {
+    audioContext = new AudioContext();
+    audioUrl = "sound/guitar.mp3";
+    // Set up the audio Analyser, the Source Buffer and javascriptNode
+    setupAudioNodes();
+    // setup the event handler that is triggered every time enough samples have been collected
+    // trigger the audio analysis and draw the results
+    javascriptNode.onaudioprocess = function() { //This is called whenever the analyserNode node tells the javascriptNode that a new batch of samples have been processed.
+      // get the Time Domain data for this sample
+      if (dummyDataTex) {
+        analyserNode.getByteTimeDomainData(dummyDataTex.image.data);
+        dummyDataTex.needsUpdate = true;
+      }
+    }
+    loadSound(audioUrl); // loadSound is called only once , loads the audio from the file and need to play it back through the speakers is loadSound, playSound
+
+  } catch (e) {
+    //alert('Web Audio API is not supported in this browser');
+  }
+});
+
+function toggleDistortion() {
+  if (!audioContext)
+    return;
+  var amt = 200;
+  distortionLevel = distortionLevel + amt;
+  if (distortionLevel == amt * 2) {
+    distortionLevel = 0;
+  }
+  distortion.curve = makeDistortionCurve(distortionLevel);
+  distortion.oversample = '4x'
+}
+
+function setupAudioNodes() {
+  sourceNode = audioContext.createBufferSource();
+  analyserNode = audioContext.createAnalyser();
+  javascriptNode = audioContext.createScriptProcessor(sampleSize, 1, 1);
+  distortion = audioContext.createScriptProcessor(sampleSize, 1, 1);
+
+  distortion = audioContext.createWaveShaper();
+  distortion.curve = makeDistortionCurve(distortionLevel);
+  distortion.oversample = '4x'
+
+  // Create the array for the data values
+  array = new Uint8Array(analyserNode.frequencyBinCount); //frequencyBinCount is the size of the array which happens to be 512 (not sure where this number is?).
+
+  // Now connect the nodes together
+  // sourceNode.connect(audioContext.destination);
+  sourceNode.connect(javascriptNode);
+  sourceNode.connect(distortion);
+
+  distortion.connect(analyserNode);
+
+  distortion.connect(audioContext.destination);
+  javascriptNode.connect(audioContext.destination);
+}
+
+// Load the audio from the URL via Ajax and store it in global variable audioData
+// Note that the audio load is asynchronous
+function loadSound(url) {
+  var request = new XMLHttpRequest(); // Ajax XMLHttpRequest
+  request.open('GET', url, true);
+  request.responseType = 'arraybuffer';
+  // When loaded, decode the data and play the sound
+  request.onload = function() { // loadSound returns immediately and before the audio has actually been downloaded and decoded. So you cannot call playSound immediately - the data is not yet there. You can call it in the onload callback as when this is called the data will be there.
+    audioContext.decodeAudioData(request.response, function(buffer) { //decodes the audio file and places the data into our global variable audioData.
+      audioData = buffer;
+      playSound(audioData);
+    }, onError);
+  }
+  request.send();
+}
+
+
+// Play the audio and loop until stopped
+function playSound(buffer) {
+  sourceNode.buffer = buffer;
+  sourceNode.start(0); // Play the sound now... feeding the data to both the destination so we can hear it, and at the same time to the Analyser so we can process it
+  sourceNode.loop = true;
+  audioPlaying = true;
+  sourceNode.onended = function() {
+    console.log("playing sound has ended");
+    //sourceNode.stop(0);
+    audioPlaying = false;
+  }
+}
+
+function makeDistortionCurve(amount) {
+  var k = typeof amount === 'number' ? amount : 50,
+    n_samples = 44100,
+    curve = new Float32Array(n_samples),
+    deg = Math.PI / 180,
+    i = 0,
+    x;
+  for (; i < n_samples; ++i) {
+    x = i * 2 / n_samples - 1;
+    curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
+  }
+  return curve;
+};
+
+function onError(e) {
+  console.log(e);
+}
+
+</script>
+
+<title>FUZZFACE!</title>
+
+</head>
+
+<body>
+
+<div id="info">
+  <div id="dorkbotpdx">DORKBOTPDX</div>
+  <h1>Analog Guitar Distortion Workshop</h1>
+  <div id="detail-description">
+	Build your own Fuzzface distortion guitar pedal clone while learning about the history and theory of analog electric guitar distortion. General principles of building analog guitar effects will also be discussed.
+
+<p>
+All parts will be provided for a working Fuzzface clone minus an enclosure. Please bring your own soldering tool, solder, wire cutters, and strippers. $30 fee covers cost of parts and PCB.
+
+  </div>
+  <div id="details-list">
+    <div id="left-details">
+      Instructor: Jim Titus<br>
+      Limited to 15 people<br>
+      RSVP required!<br>
+      RSVP to bzzt@knowhere.net
+    </div>
+    <div id="right-details">
+      Sunday, April 3rd<br>
+      1pm - 5pm @ Ctrl-H<br>7608 N. Interstate<br>
+      $30 + donation to Ctrl-H<br>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

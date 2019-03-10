@@ -1,0 +1,62 @@
+# TODO: deal with length stuff
+import urllib
+import serial
+import re
+
+MAXLENGTH = 512
+BANNER = " BZZTBOMB DOT COM "
+
+def getmessages():
+    # Get a file-like object for the Python Web site's home page.
+    f = urllib.urlopen("http://bzztbomb.com/dotdash/messages.txt")
+    # Read from the object, storing the page's contents in 's'.
+    s = f.read()
+    f.close()
+    return s
+
+def formatmessage(msg):
+    msg = msg.upper()
+    p = re.compile('[^0-9^A-Z^ ^\n]')
+    msg = p.sub(' ', msg)
+
+    ret = ''
+    lines = msg.split('\n')
+    for s in lines:
+        if (len(s) > 0):
+            if (len(ret) + len(s) < MAXLENGTH):
+                ret = ret + s
+            if (len(ret) + len(BANNER) < MAXLENGTH):
+                ret = ret + BANNER    
+    ret = chr(len(ret) >> 8) + chr(len(ret) & 0xFF) + ret
+    return ret
+        
+def waitfor(port, msg):
+    line = ''
+    while line.lower() != msg.lower():
+        line = port.readline()
+        print line
+    print "waitfor done!"
+#
+#
+def mainstuff():
+    oldmessage = ''
+    while True:    
+        msg = getmessages()
+
+        ser = serial.Serial('COM6', 9600)  # open first serial port
+        print ser.portstr       # check which port was really used
+
+        if (msg != oldmessage):
+            oldmessage = msg
+            msg = formatmessage(msg)
+            print len(msg)-2
+            print msg
+            ser.write(msg)
+
+            waitfor(ser, 'done!\r\n')
+
+        # get one rotation out!
+        waitfor(ser, 'EOM\r\n')
+        ser.close()             # close port
+
+mainstuff()

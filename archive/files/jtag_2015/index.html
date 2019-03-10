@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>HANDS ON JTAG FOR FUN AND ROOT SHELLS</title>
+    <link href='https://fonts.googleapis.com/css?family=Oswald:700|Patua+One' rel='stylesheet' type='text/css'>
+    <style>
+      body { margin: 0; color: #DDDDDD; max-width: 480px; font-family: 'Patua One', cursive; font-size: 16px;}
+      canvas { position: absolute; top: 0px; z-index: -1; }
+      h1 {
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 35px;
+        font-weight: 700;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        letter-spacing: 1px;
+      }
+      h2 {
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        margin-top: 2px;
+        letter-spacing: 2.5px;
+      }
+      #dorkbotpdx {
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 12px;
+        letter-spacing: 10px;
+        padding: 0px;
+        color: #DD5555;
+        margin-top: 5px;
+      }
+      #detail-description {
+        margin-left: 25px;
+        margin-right: 25px;
+      }
+      #details-list {
+        position: absolute;
+        top: 410px;
+        left: 10px;
+        width: 460px;
+        font-size: 14px;
+      }
+      #left-details {
+        float: left;
+      }
+      #right-details {
+        float: right;
+        text-align: right;
+      }
+      #date {
+        font-size: 18px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <script type="x-shader/x-vertex" id="vertexShader">
+      // switch on high precision floats
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      varying vec2 texCoord;
+
+      void main()
+      {
+        texCoord = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+      }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+      uniform sampler2D iChannel0;
+      uniform sampler2D iChannel1;
+      uniform vec2 iResolution;
+      uniform float iGlobalTime;
+
+      varying vec2 texCoord;
+
+      vec4 sampleIt(vec2 uv)
+      {
+        // uv = clamp(uv, 0.0, 1.0);
+        vec4 ret = texture2D(iChannel0, uv);
+        return ret;
+      }
+
+      void mainImage( out vec4 fragColor, in vec2 fragCoord )
+      {
+        vec2 c = fragCoord.xy; // / iResolution.xy;
+        c -= vec2(0.5, 0.5); // range -0.5..0.5
+        c *= 4.0; // range -2..-2
+        // Deal with aspect ratio
+        c.y *= iResolution.y / iResolution.x;
+        // Zoom based on time a bit
+        c *= 0.25 * sin(iGlobalTime*0.25) + 0.55;
+        // Nudge it over
+        c.x -= 0.9625;
+        c.y += 0.253;
+        // Let's
+        c.x += sin(c.x + iGlobalTime*0.25) * 0.5;
+        c.y += cos(c.y * 0.2 + iGlobalTime * 0.125) * 0.25;
+        vec2 curr = vec2(0,0);
+        vec4 color = vec4(0,0,0,1);
+        float distAxis = 10e5;
+        float distOrigin = 10e5;
+        vec3 bgColor = vec3(0.0);
+        vec3 bgColorTarget = vec3(0.75, 0.2, 0.1);
+
+        for (int i = 0; i < 100; i++)
+        {
+          // f(x) = x^2 + c
+          // x^2
+          vec2 newx;
+          newx.x = (curr.x * curr.x) - (curr.y * curr.y);
+          newx.y = 2.0 * curr.x * curr.y;
+          // + c
+          newx += c;
+          curr = newx;
+          float mag = sqrt(curr.x * curr.x + curr.y * curr.y);
+          vec4 tc = texture2D(iChannel0, curr);
+          vec4 tc2 = texture2D(iChannel1, curr);
+          float tmix = smoothstep(-0.25, 0.25, cos(iGlobalTime * 0.5));
+          tc = mix(tc, tc2, tmix);
+          bgColor = vec3((sin(float(i)*(3.14/100.0)) + 1.0)*0.5, 0.0, 0.0);
+          if ((mag > 2.0) || (tc.w > 0.2))
+          {
+            color = tc;
+            break;
+          }
+        }
+        fragColor = vec4(mix(color.xyz, bgColor.xyz, 1.0 - color.w) ,1.0);
+      }
+
+      void main()
+      {
+        vec4 c;
+        mainImage(c, texCoord);
+        gl_FragColor = c;
+      }
+    </script>
+
+    <script src="three.min.js"></script>
+
+    <script>
+      var buildings = [];
+
+      var loader = new THREE.TextureLoader();
+      loader.load('rasp_pi.png', function (texture) {
+        buildings.push(texture);
+        texture.minFilter = THREE.LinearFilter;
+        loader.load('jtag.png', function (texture) {
+          buildings.push(texture);
+          texture.minFilter = THREE.LinearFilter;
+          initThreeJS();
+        });
+      });
+
+      var scene, renderer, camera;
+      var start_time, facadeMaterial;
+
+      function initThreeJS() {
+        start_time = Date.now();
+        scene = new THREE.Scene();
+
+        var w2 = window.innerWidth / 2;
+        var h2 = window.innerHeight / 2;
+        camera = new THREE.OrthographicCamera(-w2, w2, h2, -h2, 1, 100);
+        camera.position.z = 1;
+
+        var canvas_width = 480; //window.innerWidth;
+        var canvas_height = 480; //window.innerHeight;
+
+        facadeMaterial = new THREE.ShaderMaterial( {
+          vertexShader: document.getElementById( 'vertexShader' ).textContent,
+          fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+          uniforms: {
+            iChannel0: { type: "t", value: buildings[0] },
+            iChannel1: { type: "t", value: buildings[1] },
+            iResolution: { type: "2f", value: [canvas_width, canvas_height]},
+            iGlobalTime: { type: "f", value: 0 }
+          },
+        } );
+
+        var geom = new THREE.PlaneGeometry(w2*2,h2*2);
+        var obj = new THREE.Mesh(geom, facadeMaterial);
+        scene.add(obj);
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(canvas_width, canvas_height);
+        document.body.appendChild( renderer.domElement );
+        render();
+      }
+
+      function render() {
+        facadeMaterial.uniforms.iGlobalTime.value = (Date.now() - start_time) / 1000.0;
+        requestAnimationFrame( render );
+        renderer.render( scene, camera );
+      }
+    </script>
+
+    <div id="info">
+      <div id="dorkbotpdx">DORKBOTPDX</div>
+      <h1>HANDS ON JTAG</h1> <h2>FOR FUN AND ROOT SHELLS</h2>
+      <div id="detail-description">
+        This workshop will start with a brief introduction to JTAG. Then quickly dive into some hands-on practice with finding, wiring, and finally exploiting a system via JTAG. This will be accomplished by hooking up wires in weird and wonderful ways to make the Raspberry Pi do things it otherwise shouldn't.
+      </div>
+      <div id="details-list">
+        <div id="left-details">
+          Instructor: Joseph FitzPatrick<br>
+          Limited space, RSVP required!<br>
+          <span id="date">RSVP to bzzt@knowhere.net</span><br>
+        </div>
+        <div id="right-details">
+          <span id="date">Sunday, Feburary 28th, 1pm</span><br>
+          @ Ctrl-H, 7608 N. Interstate<br>
+          FREE, please donate to Ctrl-H<br>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

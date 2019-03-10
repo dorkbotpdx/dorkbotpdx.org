@@ -1,0 +1,112 @@
+@font-face {
+    font-family: 'fira_sansregular';
+    src: url('firasans-regular-webfont.eot');
+    src: url('firasans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('firasans-regular-webfont.woff2') format('woff2'),
+         url('firasans-regular-webfont.woff') format('woff'),
+         url('firasans-regular-webfont.ttf') format('truetype'),
+         url('firasans-regular-webfont.svg#fira_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'senregular';
+    src: url('sen-regular-webfont.eot');
+    src: url('sen-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('sen-regular-webfont.woff2') format('woff2'),
+         url('sen-regular-webfont.woff') format('woff'),
+         url('sen-regular-webfont.ttf') format('truetype'),
+         url('sen-regular-webfont.svg#senregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'source_code_proregular';
+    src: url('sourcecodepro-regular-webfont.eot');
+    src: url('sourcecodepro-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('sourcecodepro-regular-webfont.woff2') format('woff2'),
+         url('sourcecodepro-regular-webfont.woff') format('woff'),
+         url('sourcecodepro-regular-webfont.ttf') format('truetype'),
+         url('sourcecodepro-regular-webfont.svg#source_code_proregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+#main-psoc-container {
+    width: 480px;
+    font-family: 'fira_sansregular', Fallback, sans-serif;
+    font-size: 13px;
+    /*margin: auto;*/
+}
+.no-m {
+    margin: 0;
+}
+#svg-container, #text-container {
+    position: absolute;
+    width: 480px;
+    height: 1024px;
+}
+#event {
+    color: #747474;
+    text-align: center;
+    border-bottom: 3px solid #555;
+    font-size: 24px;
+}
+#topic {
+    font-size: 24px;
+    font-family: 'senregular';
+    text-align: center;
+    border-bottom: 6px solid #555;
+}
+#inner-text-container {
+    color: #FFF;
+    width: 240px;
+    margin: 110px auto 0;
+}
+.center {
+    font-size: 16px;
+    text-align: center;
+    padding: 2px 0;
+    margin: 0;
+}
+.med {
+    font-size: 14px;
+    margin: 2px 0;
+    line-height: 17px;
+}
+.small {
+    font-size: 12px;
+    margin: 8px 0;
+    line-height: 15px;
+}
+.corner {
+    width: 125px;
+    margin: 26px 0 0 0px;
+    text-align: center;
+    font-size: 18px;
+    background-color: #DDD;
+    border-radius: 8px;
+    padding: 1px 4px;    
+}
+.corner p {
+    margin: 10px 0;
+    line-height: 20px;
+}
+.corner a {
+    text-decoration: none;
+    color: #FF006E;
+}
+.info-l, .info-r {
+    float: left;
+    padding: 10px;
+    font-size: 16px;
+    color: #444;
+}
+.info-l {
+    width: 135px;
+    margin-left: 10px;
+}
+.info-r {
+    width: 260px;
+    margin-left: 30px;
+}

@@ -1,0 +1,137 @@
+var paths = [
+    {"id": "bkgd-path010", "class": "bkgd", "d": "m 359.2499823706052,138.75 56,0 0,-54 0,0"},
+    {"id": "bkgd-path011", "class": "bkgd", "d": "m 359.2499823706052,155.75 122.0000000000001,0 0,0"},
+    {"id": "bkgd-path012", "class": "bkgd", "d": "m 359.2499823706052,203.75 70.0000000000001,0 0,-26 50,0"},
+    {"id": "bkgd-path013", "class": "bkgd", "d": "m 359.2499823706052,222.75 89,0"},
+    {"id": "bkgd-path014", "class": "bkgd", "d": "m 359.2499823706052,271.6641998291016 36,0 86,0"},
+    {"id": "bkgd-path015", "class": "bkgd", "d": "m 345.2499823706052,358.75 0,121"},
+    {"id": "bkgd-path016", "class": "bkgd", "d": "m 328.2499823706052,358.75 0,47"},
+    {"id": "bkgd-path018", "class": "bkgd", "d": "m 311.2499823706052,358.75 0,24 -32.9999999999998,0 0,98"},
+    {"id": "bkgd-path017", "class": "bkgd", "d": "m 294.2499823706052,480.75 0,-76"},
+    {"id": "bkgd-path019", "class": "bkgd", "d": "m 201.2499823706054,358.75 0,23 30,0"},
+    {"id": "bkgd-path020", "class": "bkgd", "d": "m 181.2499823706054,359.75 0,41 49,0 0,82"},
+    {"id": "bkgd-path021", "class": "bkgd", "d": "m 161.2499823706054,358.75 0,62 45,0 0,60"},
+    {"id": "bkgd-path023", "class": "bkgd", "d": "m 120.2499823706054,320.75 -119.9999952587888856,0"},
+    {"id": "bkgd-path024", "class": "bkgd", "d": "m 120.2499823706054,301.75 -119.9999899999998547,0"},
+    {"id": "bkgd-path025", "class": "bkgd", "d": "m 121.2499823706054,283.75 -119.999989999999854,0"},
+    {"id": "bkgd-path022", "class": "bkgd", "d": "m 121.2499823706054,339.75 -119.999992899999853,0"},
+    {"id": "bkgd-path026", "class": "bkgd", "d": "m 120.2499823706054,257.75 -87.99999499999985,0"},
+    {"id": "bkgd-path027", "class": "bkgd", "d": "m 120.2499823706054,229.75 -44.99999499999992,0"},
+    {"id": "bkgd-path028", "class": "bkgd", "d": "m 119.2499823706054,196.75 -82.99999499999985,0 0,-197"},
+    {"id": "bkgd-path029", "class": "bkgd", "d": "m 120.2499823706054,176.75 -59.99999499999993,-1 0,-175"},
+    {"id": "bkgd-path030", "class": "bkgd", "d": "m 119.2499823706054,154.75 -37.99999499999992,0 0,-155"},
+    {"id": "bkgd-path001", "class": "bkgd", "d": "m 157.2499823706054,118.75 0,-29 -51,0"},
+    {"id": "bkgd-path002", "class": "bkgd", "d": "m 177.2499823706054,118.75 0,-64"},
+    {"id": "bkgd-path003", "class": "bkgd", "d": "m 206.2499823706054,118.75 0,-119"},
+    {"id": "bkgd-path004", "class": "bkgd", "d": "m 229.2499823706054,118.75 0,-119 0,0"},
+    {"id": "bkgd-path005", "class": "bkgd", "d": "m 251.2499823706054,118.75 0,-119 0,0"},
+    {"id": "bkgd-path006", "class": "bkgd", "d": "m 272.2499823706054,118.75 0,-119"},
+    {"id": "bkgd-path007", "class": "bkgd", "d": "m 297.2499823706052,119.75 0,-97 182.0000000000001,0 0,0"},
+    {"id": "bkgd-path008", "class": "bkgd", "d": "m 315.2499823706052,119.75 0,-83 164.0000000000001,0 0,0"},
+    {"id": "bkgd-path009", "class": "bkgd", "d": "m 335.2499823706052,118.75 0,-63 145.0000000000001,0 0,0"},
+    {"id": "bkgd-path345", "class": "bkgd", "d": "m 359.2539822426114,249 121,1"},
+    {"id": "bkgd-path346", "class": "bkgd", "d": "m 359.2499823706052,294.328369140625 98,0 0,186"},
+    {"id": "bkgd-path347", "class": "bkgd", "d": "m 359.2573345168261,318 68,0 0,162 0,0"},
+    {"id": "path010", "class": "active terminal r3", "attach": "r3", "d": "m 359.2499823706052,138.75 56,0 0,-54 0,0"},
+    {"id": "path011", "class": "active r3", "attach": "r3", "d": "m 359.2499823706052,155.75 122.0000000000001,0 0,0"},
+    {"id": "path012", "class": "active r4", "attach": "r4", "d": "m 359.2499823706052,203.75 70.0000000000001,0 0,-26 50,0"},
+    {"id": "path013", "class": "active r4 terminal", "attach": "r4", "d": "m 359.2499823706052,222.75 89,0"},
+    {"id": "path014", "class": "active r5", "attach": "r5", "d": "m 359.2499823706052,271.6641998291016 36,0 86,0"},
+    {"id": "path015", "class": "active r6", "attach": "r6", "d": "m 345.2499823706052,358.75 0,121"},
+    {"id": "path016", "class": "active terminal r6", "attach": "r6", "d": "m 328.2499823706052,358.75 0,47"},
+    {"id": "path018", "class": "active r6", "attach": "r6", "d": "m 311.2499823706052,358.75 0,24 -32.9999999999998,0 0,98"},
+    {"id": "path017", "class": "active terminal external free", "d": "m 294.2499823706052,480.75 0,-76"},
+    {"id": "path019", "class": "active terminal free", "d": "m 201.2499823706054,358.75 0,23 30,0"},
+    {"id": "path020", "class": "active r7", "attach": "r7", "d": "m 181.2499823706054,359.75 0,41 49,0 0,82"},
+    {"id": "path021", "class": "active r7", "attach": "r7", "d": "m 161.2499823706054,358.75 0,62 45,0 0,60"},
+    {"id": "path023", "class": "active free", "d": "m 120.2499823706054,320.75 -119.9999952587888856,0"},
+    {"id": "path024", "class": "active r8", "attach": "r8", "d": "m 120.2499823706054,301.75 -119.9999899999998547,0"},
+    {"id": "path025", "class": "active r8", "attach": "r8", "d": "m 121.2499823706054,283.75 -119.999989999999854,0"},
+    {"id": "path022", "class": "active free", "d": "m 121.2499823706054,339.75 -119.999992899999853,0"},
+    {"id": "path026", "class": "active terminal r8", "attach": "r8", "d": "m 120.2499823706054,257.75 -87.99999499999985,0"},
+    {"id": "path027", "class": "active terminal free", "d": "m 120.2499823706054,229.75 -44.99999499999992,0"},
+    {"id": "path028", "class": "active r9", "attach": "r9", "d": "m 119.2499823706054,196.75 -82.99999499999985,0 0,-197"},
+    {"id": "path029", "class": "active r9", "attach": "r9", "d": "m 120.2499823706054,176.75 -59.99999499999993,-1 0,-175"},
+    {"id": "path030", "class": "active r9", "attach": "r9", "d": "m 119.2499823706054,154.75 -37.99999499999992,0 0,-155"},
+    {"id": "path001", "class": "active terminal r1", "attach": "r1", "d": "m 157.2499823706054,118.75 0,-29 -51,0"},
+    {"id": "path002", "class": "active terminal r1", "attach": "r1", "d": "m 177.2499823706054,118.75 0,-64"},
+    {"id": "path003", "class": "active r1", "attach": "r1", "d": "m 206.2499823706054,118.75 0,-119"},
+    {"id": "path004", "class": "active r1", "attach": "r1", "d": "m 229.2499823706054,118.75 0,-119 0,0"},
+    {"id": "path005", "class": "active free", "d": "m 251.2499823706054,118.75 0,-119 0,0"},
+    {"id": "path006", "class": "active r2", "attach": "r2", "d": "m 272.2499823706054,118.75 0,-119"},
+    {"id": "path007", "class": "active r2", "attach": "r2", "d": "m 297.2499823706052,119.75 0,-97 182.0000000000001,0 0,0"},
+    {"id": "path008", "class": "active r2", "attach": "r2", "d": "m 315.2499823706052,119.75 0,-83 164.0000000000001,0 0,0"},
+    {"id": "path009", "class": "active free", "d": "m 335.2499823706052,118.75 0,-63 145.0000000000001,0 0,0"},
+    {"id": "path345", "class": "active free", "d": "m 359.2539822426114,249 121,0"},
+    {"id": "path346", "class": "active r5", "attach": "r5", "d": "m 359.2499823706052,294.328369140625 98,0 0,186"},
+    {"id": "path347", "class": "active r5", "attach": "r5", "d": "m 359.2573345168261,318 68,0 0,162 0,0"}
+];
+
+var rectangles = [
+    {"width": 75, "height": 29, "out": {"x":-90, "y":215}, "in": {"x":80, "y":215}, "class": "r9", "angle":-90},
+    {"width": 72, "height": 29, "out": {"x":-120, "y":322.5}, "in": {"x":80, "y":322.5}, "class": "r8", "angle":-90},
+    {"width": 95, "height": 29, "out": {"x":141.5, "y":-60}, "in": {"x":141.5, "y":78.499992}, "class": "r1", "angle":0},
+    {"width": 71, "height": 29, "out": {"x":265, "y":-160}, "in": {"x":265, "y":78.499992}, "class": "r2", "angle":0},
+    {"width": 48, "height": 29, "out": {"x":570, "y":122}, "in": {"x":400, "y":122}, "class": "r3", "angle":90},
+    {"width": 48, "height": 29, "out": {"x":600, "y":194.5}, "in": {"x":400, "y":194.5}, "class": "r4", "angle":90},
+    {"width": 81, "height": 29, "out": {"x":540, "y":260.5}, "in": {"x":400, "y":260.5}, "class": "r5", "angle":90},
+    {"width": 52, "height": 29, "out": {"x":190, "y":580}, "in": {"x":190, "y":399}, "class": "r7", "angle":180},
+    {"width": 108, "height": 29, "out": {"x":365, "y":640}, "in": {"x":365, "y":399}, "class": "r6", "angle":180}
+];
+
+var circles = [
+    {"cx": 415.5, "cy": 78.5, "attach": "path010"},
+    {"cx": 328, "cy": 410, "attach": "path016"},
+    {"cx": 294, "cy": 400, "attach": "path017"},
+    {"cx": 237, "cy": 383, "attach": "path019"},
+    {"cx": 27, "cy": 258, "attach": "path026"},
+    {"cx": 69.99998474121094, "cy": 229, "attach": "path027"},
+    {"cx": 100.9999771118164, "cy": 90, "attach": "path001"},
+    {"cx": 176.9999694824219, "cy": 51, "attach": "path002"},
+    {"cx": 452, "cy": 223, "attach": "path013"}
+];
+
+// objects instead of just strings
+// because they'll get assigned colors
+var shortNames = [
+    {"name": "USB"},
+    {"name": "LCD"},
+    {"name": "ADC"},
+    {"name": "DAC"},
+    {"name": "PWM"},
+    {"name": "CAN"},
+    {"name": "TIA"},
+    {"name": "PGA"},
+    {"name": "SPI"},
+    {"name": "S&H"},
+    {"name": "LIN"}
+];
+
+var medNames = [
+    {"name": "UART"},
+    {"name": "MDIO"},
+    {"name": "Vref"},
+    {"name": "EMIF"},
+    {"name": "PMBus"},
+    {"name": "SMBus"},
+    {"name": "SGPIO"},
+    {"name": "OpAmp"},
+    {"name": "Timer"},
+    {"name": "Boost"}
+];
+
+var longNames = [
+    {"name": "S/PDIF"},
+    {"name": "Counter"},
+    {"name": "CapSense"}
+];
+
+var xLongNames = [
+    {"name": "Amplifier"},
+    {"name": "TempSensor"},
+    {"name": "Comparator"},
+    {"name": "Custom Logic"},
+    {"name": "Custom Analog"},
+    {"name": "Power Monitor"}
+];
+

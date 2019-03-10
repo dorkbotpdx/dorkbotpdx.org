@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300|Fjalla+One' rel='stylesheet' type='text/css'>
+
+<script type="text/javascript">
+
+function sizeCanvas() {
+var canvases = document.getElementsByTagName('canvas');
+
+for (var i = 0; i < canvases.length; i++) {
+
+
+    canvases[i].style.width = '100%';
+    canvases[i].style.height = '100%';
+    canvases[i].width = canvases[i].clientWidth;
+    canvases[i].height = canvases[i].clientHeight;
+  }
+
+}
+
+function flyer() {
+  sizeCanvas();
+
+  var c = $("#myCanvas");
+  c.width(c.width());
+  c.height(c.height());
+
+  var canvas = $("#myCanvas"),
+    ctx = canvas.get(0).getContext("2d"),
+    width = canvas.width(),
+    height = canvas.height(),
+    dark = "#444444",
+    light = "#000000",
+    curCircles = [],
+    radius = 20;
+
+  ctx.fillStyle = "#111111";
+  ctx.fillRect(0,0,width,height);
+  ctx.translate(0.5, 0.5);
+  ctx.imageSmoothingEnabled = true;
+  ctx.lineWidth = 3;
+
+  function line(x1,y1,x2,y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.strokeStyle = dark;
+    ctx.stroke();
+  }
+
+  function circle(x, y, r, c) {
+    curCircles.push({cx : x, cy : y, cr : r});
+  }
+
+  function add_circles() {
+    var num_added = 0;
+    for (var i = 0; i < curCircles.length; i++) {
+      var search_radius = 50 + Math.random() * 50.0;
+      var search_radius_squared = search_radius*search_radius;
+      var t = Math.random() * 2 * Math.PI;
+
+      var curCircle = curCircles[i];
+      var t = Math.random() * Math.PI * 2;
+      var nx = search_radius * Math.cos(t) + curCircle.cx;
+      var ny = search_radius * Math.sin(t) + curCircle.cy;
+      if ((nx > width + radius) || (nx < -radius) || (ny > height + radius) || (ny < -radius))
+        continue;
+      var s = 0;
+      var found = false;
+      for (s = 0; s < curCircles.length; s++) {
+        var test_circle = curCircles[s];
+        var dist_squared = (nx-test_circle.cx)*(nx-test_circle.cx)+(ny-test_circle.cy)*(ny-test_circle.cy);
+        if ((dist_squared < search_radius_squared) && (dist_squared > 0)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        line(curCircle.cx,curCircle.cy,nx,ny);
+        circle(nx,ny,radius, dark);
+        num_added++;
+      }
+    }
+    return num_added;
+  }
+
+  circle(Math.random() * width, Math.random() * height, radius, dark);
+  var zero_added = 0;
+  while (zero_added < 64) {
+    if (add_circles() > 0) {
+      zero_added = 0;
+    } else {
+      zero_added++;
+    }
+  }
+  var i;
+  for (i=0; i < curCircles.length; i++) {
+    var curCircle = curCircles[i];
+
+    // ctx.beginPath();
+    // ctx.arc(curCircle.cx, curCircle.cy, curCircle.cr, 0, 2*Math.PI);
+    // ctx.fillStyle = dark;
+    // ctx.fill();
+    // ctx.strokeStyle = dark;
+    // ctx.stroke();
+
+    var num_sides = Math.floor(3 + Math.random() * 5);
+    var t = Math.random() * 2 * Math.PI;
+    var j, q;
+    var radii = [1.0, 0.99, 0.66, 0.60, 0.25];
+
+    for (q = 0; q < radii.length; q++) {
+      ctx.beginPath();
+      for (j = 0; j <= num_sides; j++) {
+        var x,y;
+        x = (curCircle.cr * radii[q]) * Math.cos(t) + curCircle.cx;
+        y = (curCircle.cr * radii[q]) * Math.sin(t) + curCircle.cy;
+        if (j==0)
+          ctx.moveTo(x,y);
+        else
+          ctx.lineTo(x,y);
+        t += (Math.PI * 2) / num_sides;
+
+        ctx.fillStyle = (q == 4 ? dark : light);
+        ctx.strokeStyle = dark;
+        ctx.stroke();
+        ctx.fill();
+      }
+    }
+  }
+}
+
+$( window ).resize(flyer);
+
+$(document).ready(flyer);
+</script>
+
+<style>
+
+* { margin:0; padding:0; } /* to remove the top and left whitespace */
+
+html, body { width:100%; height:100%; font-family: 'Open Sans', sans-serif; } /* just to be sure these are full screen*/
+
+canvas {
+  margin: 0;
+  padding: 0;
+  display:block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+a:link, a:visited {
+  color: #fc3da5;
+}
+
+#info-container {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+
+#header {
+  background-color: rgba(99, 99, 99, 0.35);
+  font-size: 60px;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  line-height: 75px;
+}
+
+#header h1 {
+  color: #fc3da5;
+  font-size: 69px;
+  font-family: 'Fjalla One';
+}
+
+#subheader {
+  background-color: rgba(99, 99, 99, 0.2);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 20px;
+  line-height: 24px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 45px;
+  padding-right: 45px;
+  font-weight: 300;
+  letter-spacing: .05em;
+}
+
+#more-info {
+  font-size: 15px;
+  line-height: 21px;
+  color: rgb(222,222,222);
+  letter-spacing: .05em;
+  text-align: right;
+  position: absolute;
+  bottom: 0;
+  width: 95%;
+  padding-bottom: 20px;
+  margin-right: 20px;
+}
+
+.info-type {
+  font-weight: 400;
+  color: rgb(222,222,222);
+}
+
+H2 {
+  font-size: 28px;
+  line-height: 34px;
+  font-family: 'Fjalla One', sans-serif;
+  color: #fc3da5;
+}
+
+H3 {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+</style>
+
+<canvas id="myCanvas">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+
+<div id="info-container">
+  <div id="header">
+    <h1>FEDERATED WIKI WORKSHOP</h1>
+  </div>
+  <div id="subheader">
+    LEARN ABOUT FEDERATED WIKI: A decentralized approach to collaboration and publication.  It differs from a standard wiki in that you can run your own server and share your changes with others running their own servers.  Find out more <a target="_blank" href="http://dork.wiki.org/view/welcome-visitors/view/federation-indoctrination/view/federated-wiki-workshop">here</a>.
+  </div>
+  <div id="more-info">
+    <H2>Sunday, April 26th, 1-5pm</H2>
+    <H3>with <a target="_blank" href="https://twitter.com/wardcunningham">Ward Cunningham</a></H3>
+    <STRONG><a target="_blank" href="https://ctrlh.org">Ctrl-H</a>,</STRONG> 7608 N. Interstate, Portland, OR 97217<br>
+    FREE! (+ Donation for Ctrl-H)<br>
+    Bring a laptop with <a target="_blank" href="http://nodejs.org">NodeJS</a> pre-installed<br>
+    RSVP to bzzt@knowhere.net
+  </div>
+</div>
+
+</body>
+</html>

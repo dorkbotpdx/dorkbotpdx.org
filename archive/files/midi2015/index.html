@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>MIDI</title>
+    <style>
+      body { margin: 0; }
+      canvas { width: 100%; height: 100% }
+    </style>
+  </head>
+  <body>
+    <script src="three.min.js"></script>
+    <script src="OrbitControls.js"></script>
+
+    <script src="ExtrudeGeometry.js"></script>
+    <script src="FontUtils.js"></script>
+    <script src="TextGeometry.js"></script>
+
+    <script src="helvetiker_bold.typeface.js"></script>
+
+    <script>
+      var scene = new THREE.Scene();
+
+      var FOV = 60.0;
+      var CAM_Z = 5.0;
+      var RATIO = window.innerWidth / window.innerHeight;
+      var camera = new THREE.PerspectiveCamera(FOV, RATIO, 0.1, 1000 );
+      camera.position.z = CAM_Z;
+      camera.updateMatrix();
+      camera.updateMatrixWorld();
+      camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+      camera.updateProjectionMatrix();
+
+      var light = new THREE.PointLight( 0xffffff, 1, 100 );
+      camera.add( light );
+      scene.add(camera);
+
+      camera.position.x = -4.555106286158506;
+      camera.position.y = 1.7560222891936064;
+      camera.position.z = 3.7216779387631114;
+
+      var controls = new THREE.OrbitControls(camera);
+      var controlsActive = true;
+
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setClearColor( 0xeeffee, 1);
+      renderer.setSize( window.innerWidth, window.innerHeight );
+
+      document.body.appendChild( renderer.domElement );
+
+      var buttons = [];
+
+      function createMIDIController() {
+        var numCols = 4.0;
+        var numRows = 4.0;
+        var gridSize = 1.0;
+        var buttonPct = 0.8;
+        var bodyMargin = 0.25;
+        var bodyDepth = 1.0;
+
+        var startX = (gridSize * numCols * -0.5) + (gridSize * 0.5);
+        var startY = (gridSize * numRows * -0.5) + (gridSize * 0.5);
+        var margin = (gridSize * (1.0 - buttonPct)) * 0.5;
+        var btnSize = gridSize * buttonPct;
+
+        var x, y;
+        for (y = 0; y < numRows; y++) {
+          for (x = 0; x < numCols; x++) {
+            var geometry = new THREE.BoxGeometry( btnSize, btnSize, btnSize );
+            var material = new THREE.MeshPhongMaterial( { color: 0xBBDDFF, shininess: 3 } );
+            var cube = new THREE.Mesh( geometry, material );
+            cube.position.x = startX + (x * gridSize);
+            cube.position.y = startY + (y * gridSize);
+            scene.add( cube );
+            buttons.push(cube);
+          }
+        }
+
+        // Create body
+        {
+          var bodySize = numCols * gridSize + (gridSize * bodyMargin * 2.0);
+          var geometry = new THREE.BoxGeometry( bodySize, bodySize * 1.1, bodyDepth );
+          var material = new THREE.MeshPhongMaterial( { color: 0x8833FF, metal: true, specular: 0x9944FF, shininess: 3 } );
+          var cube = new THREE.Mesh( geometry, material );
+          cube.position.x = 0;
+          cube.position.y = bodySize * 0.05;
+          cube.position.z = -bodyDepth * 0.5;
+          scene.add( cube );
+        }
+
+        // Create label
+        {
+        height = 20,
+        size = 70,
+        hover = 3,
+
+        curveSegments = 8,
+
+        bevelThickness = 0.25,
+        bevelSize = 0.5,
+        bevelSegments = 30,
+        bevelEnabled = true,
+
+        font = "helvetiker", // helvetiker, optimer, gentilis, droid sans, droid serif
+        weight = "bold", // normal bold
+        style = "normal"; // normal italic
+        var textGeo = new THREE.TextGeometry("DORKBOTPDX", { size: size, height: height, curveSegments: curveSegments, font: font, weight: weight, style: style,
+        bevelThickness: bevelThickness,
+          bevelSize: bevelSize,
+          bevelEnabled: bevelEnabled,
+
+          material: 0,
+          extrudeMaterial: 1});
+            var material = new THREE.MeshPhongMaterial( { color: 0xFFDD00, shininess: 300, metal: true, specular: 0x9944FF, } );
+          textGeo.computeBoundingBox();
+          textGeo.computeVertexNormals();
+          textMesh = new THREE.Mesh(textGeo, material);
+          textMesh.position.y = 2.15;
+          textMesh.position.z = -0.05100;
+          textMesh.position.x = ((textGeo.boundingBox.max.x - textGeo.boundingBox.min.x) * -0.5) * 0.005;
+          textMesh.scale.set(0.005, 0.005, 0.009);
+          scene.add(textMesh);
+        }
+
+      }
+
+      createMIDIController();
+
+      var fingertip;
+      var fingertipOffset = 0.8;
+
+      function createHand() {
+        var skinMaterial = new THREE.MeshPhongMaterial( { color: 0x704139, shininess: 4, specular: 0xffe0bd } );
+        // Pointer finger
+        var thick = 0.5;
+        var deep = 0.75;
+        var geometry = new THREE.BoxGeometry( thick, thick, deep );
+        fingertip = new THREE.Mesh( geometry, skinMaterial );
+        fingertip.position.x = 0;
+        fingertip.position.y = 0;
+        fingertip.position.z = 2;
+        scene.add( fingertip );
+
+        thick = 0.6;
+        deep = 0.8;
+        geometry = new THREE.BoxGeometry( thick, thick, deep );
+        var cube = new THREE.Mesh( geometry, skinMaterial );
+        cube.position.x = 0;
+        cube.position.y = 0;
+        cube.position.z = 0.85;
+        fingertip.add( cube );
+
+        geometry = new THREE.BoxGeometry( thick, thick, deep );
+        var cube = new THREE.Mesh( geometry, skinMaterial );
+        cube.position.x = 0;
+        cube.position.y = 0;
+        cube.position.z = 1.7;
+        fingertip.add( cube );
+
+        // Other fingers
+        var i;
+        for (i = 0; i < 3; i++) {
+          var cube = new THREE.Mesh( geometry, skinMaterial );
+          cube.position.x = (thick+0.1) * (i+1);
+          cube.position.y = 0;
+          cube.position.z = 1.7;
+          fingertip.add( cube );
+        }
+
+        // Top of hand
+        deep = 0.6;
+        thick = 0.7 * 4;
+        handthick = thick;
+        geometry = new THREE.BoxGeometry( thick, deep, thick * 0.5 );
+        var cube = new THREE.Mesh( geometry, skinMaterial );
+        cube.position.x = 1.1;
+        cube.position.y = 0;
+        cube.position.z = 2.9;
+        fingertip.add( cube );
+
+        // Thumb
+        thick = 0.6;
+        deep = 0.4;
+        geometry = new THREE.BoxGeometry( thick * 2.5, thick, deep );
+        var cube = new THREE.Mesh( geometry, skinMaterial );
+        cube.position.x = -1.1;
+        cube.position.y = 0;
+        cube.position.z = 3.4;
+        fingertip.add( cube );
+
+        // Arm
+        thick = 0.6;
+        deep = 4.0;
+        geometry = new THREE.BoxGeometry( 0.7 * 3.6, thick, deep );
+        var cube = new THREE.Mesh( geometry, skinMaterial );
+        cube.position.x = 1.1;
+        cube.position.y = 0;
+        cube.position.z = 5.75;
+        fingertip.add( cube );
+      }
+
+      createHand();
+
+      var animation;
+
+      function hitButton(idx) {
+        var i;
+        for (i=0; i < buttons.length; i++) {
+          buttons[i].material.color.setHex(0xBBDDFF);
+          buttons[i].material.emissive.setHex(0x000000);
+        }
+        var endPosZ = buttons[idx].position.clone();
+        endPosZ.z -= 0.25;
+        animation = {
+          model : buttons[idx],
+          startPos : buttons[idx].position.clone(),
+          endPos : endPosZ,
+          clock : new THREE.Clock(true),
+          targettime : 0.06125,
+          moveFingertip : true,
+          complete : function(a) {
+            a.model.material.emissive.setHex(0xAA99FF);
+            animation = {
+              model : a.model,
+              startPos : a.endPos,
+              endPos : a.startPos,
+              clock : new THREE.Clock(true),
+              targettime : 0.06125,
+              moveFingertip : true
+            }
+          }
+        };
+      }
+
+      function moveToButton(idx) {
+        var startPos = fingertip.position.clone();
+        startPos.z = 1.0;
+        var endPos = buttons[idx].position.clone();
+        endPos.z += + fingertipOffset;
+        animation = {
+          model : fingertip,
+          startPos : startPos,
+          endPos : endPos,
+          clock : new THREE.Clock(true),
+          targettime : 2.0,
+          moveFingertip : false,
+          complete : function(a) {
+            hitButton(idx);
+          }
+        }
+      }
+
+      var lastIdx = -1;
+      function tick() {
+        var newIdx = Math.floor(buttons.length * Math.random());
+        while (newIdx == lastIdx)
+          newIdx = Math.floor(buttons.length * Math.random());
+        moveToButton(newIdx);
+        lastIdx = newIdx;
+      }
+      setInterval(tick, 3000);
+
+      function animate() {
+        if (!animation)
+          return;
+        var t = animation.clock.getElapsedTime() / animation.targettime;
+        if (t > 1.0)
+          t = 1.0;
+        animation.model.position.lerpVectors(animation.startPos, animation.endPos, t);
+        if (animation.moveFingertip) {
+          fingertip.position.x = animation.model.position.x;
+          fingertip.position.y = animation.model.position.y;
+          fingertip.position.z = animation.model.position.z + fingertipOffset;
+        }
+        if (t >= 1.0) {
+          a = animation;
+          animation = null;
+          if (a.complete)
+            a.complete(a);
+        }
+      }
+
+      function render() {
+        requestAnimationFrame( render );
+        animate();
+        renderer.render( scene, camera );
+
+        console.log(camera.position);
+      }
+      render();
+
+      tick();
+    </script>
+  </body>
+</html>There's a retro WebGL flyer if you view this on a device that supports it!

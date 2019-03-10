@@ -1,0 +1,37 @@
+
+Part    Value     Device              Package              Description      
+                                
+3.3V    REG1117   LD1117              SOT223               800mA and 1A Low Dropout (LDO) Digikey 497-1241-1-ND
+5V      REG1117   LD1117              SOT223               800mA and 1A Low Dropout (LDO) Digikey 497-1243-1-ND
+C5      .1uF      CAP0805             0805                 Capacitor                                        
+C6      .1uF      CAP0805             0805                 Capacitor                                        
+C7      10uF      CAP_POL3528         EIA3528              Tantalum Capacitor Polarized Digikey 718-1124-1-ND                         
+C8      10uF      CAP_POL3528         EIA3528              Tantalum Capacitor Polarized Digikey 718-1124-1-ND
+
+                           
+C1      10uF      CAP_POLPTH2         CPOL-RADIAL-10UF-25V Capacitor Polarized   Digikey P813-ND                       
+C2      .1uF      CAP0805             0805                 Capacitor                                        
+C3      .1uF      CAP0603             0603                 Solder bridge for using Benito                                        
+R1      10K       RESISTOR            0805                 Resistor                                         
+R2      1K        RESISTOR            0805                 Resistor                                         
+R3      10K       TRIM_US-B64Y        B64Y                 POTENTIOMETER Digikey 3352T-103LF-ND                                
+IC1     MEG3288-P MEGA328-P           DIL28-3              MICROCONTROLLER + 28 pin socket  
+T1                2N3906-PNP-TO92-EBC TO92-EBC             PNP Transistor                                  
+JP1               16MHz Resonator     1X03_LOCK            Digkikey X908-ND                                         
+                           
+IR                M05LOCK             1X05_LOCK            Header 5 pin                                        
+JP7     LCD       PINHD-1X16          1X16                 Female Pin Header                                       
+CTRL              M02LOCK             1X02_LOCK            Header 2 pin                                      
+ENC               M04LOCK             1X04_LOCK            Header 4 pin                                     
+PROG    PROG      M05LOCK             1X05_LOCK            Header 5 pin                                     
+PWR_IN            M02LOCK             1X02_LOCK            Header 2 pin                                     
+PWR_OUT           M03LOCK             1X03_LOCK            Header 3 pin                                     
+RESET             M02LOCK             1X02_LOCK            Header 2 pin                                     
+THERMO            M02LOCK             1X02_LOCK            Header 2 (right angle)                                         
+U$1               AVR_SPI_PRG_6NS     2X3-NS               AVR ISP 6 Pin
+
+                                 
+C4      .1uF      CAP0805             0805                 Capacitor                                        
+U$2     MAX6675   MAX6675             SO08                 Digkikey MAX6675ISA+-ND
+
+Encoder (like Mouser 652-PEC11-4215F-S24) and/or switches to set temperature and control unit.                                                 
