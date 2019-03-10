@@ -1,0 +1,186 @@
+An Introduction To Pure Data (2012)
+2012-03-13 22:24:43
+breedx
+
+<p>Back by popular demand, it's the Dorkbot PDX Introduction to <a href='http://puredata.info'>Pure Data</a>. This course is geared at students new to Pd or those who have tinkered in the past and would like another primer.</p>
+<p></p>
+<div id="toc" class="toc">
+<div id="toctitle">
+<h2>Contents</h2>
+</div>
+<ul>
+<li class="toclevel-1"><a href="#Details:"><span class="tocnumber">1</span> <span class="toctext">Details:</span></a></li>
+<li class="toclevel-1"><a href="#About_Pd"><span class="tocnumber">2</span> <span class="toctext">About Pd</span></a></li>
+<li class="toclevel-1"><a href="#Prep.2FBring"><span class="tocnumber">3</span> <span class="toctext">Prep/Bring</span></a></li>
+<li class="toclevel-1"><a href="#Course_Outline"><span class="tocnumber">4</span> <span class="toctext">Course Outline</span></a>
+<ul>
+<li class="toclevel-2"><a href="#phase_1:_examples.2Finspiration_.28.7E15_minutes.29"><span class="tocnumber">4.1</span> <span class="toctext">phase 1: examples/inspiration (~15 minutes)</span></a></li>
+<li class="toclevel-2"><a href="#phase_2:_pd_primer_.28.7E15_minutes.29"><span class="tocnumber">4.2</span> <span class="toctext">phase 2: pd primer (~15 minutes)</span></a></li>
+<li class="toclevel-2"><a href="#phase_3:_basics"><span class="tocnumber">4.3</span> <span class="toctext">phase 3: basics</span></a></li>
+<li class="toclevel-2"><a href="#phase_4:_learn_how_to_build_a_counter"><span class="tocnumber">4.4</span> <span class="toctext">phase 4: learn how to build a counter</span></a></li>
+<li class="toclevel-2"><a href="#phase_5:_outlet_ordering"><span class="tocnumber">4.5</span> <span class="toctext">phase 5: outlet ordering</span></a></li>
+<li class="toclevel-2"><a href="#phase_6:_putting_it_together"><span class="tocnumber">4.6</span> <span class="toctext">phase 6: putting it together</span></a></li>
+<li class="toclevel-2"><a href="#Bonus:_If_time_allows...."><span class="tocnumber">4.7</span> <span class="toctext">Bonus: If time allows....</span></a></li>
+<li class="toclevel-2"><a href="#where_to_find_more:"><span class="tocnumber">4.8</span> <span class="toctext">where to find more:</span></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p></p>
+<h2><span class="mw-headline" id="Details:">Details:</span></h2>
+<ul>
+<li>When: Sunday, April 1st, 2012</li>
+<li>Where: <a href='http://collectiveagency.co'>Collective Agency</a> (322 NW 6th Ave, Suite 200) in Portland, OR</li>
+<li>Time: 1-5pm</li>
+<li>Instructors: Collin, Alex, Jesse, Jason</li>
+<li>Cost: FREE</li>
+</ul>
+<h2><span class="mw-headline" id="About_Pd">About Pd</span></h2>
+<p>Pd (aka Pure Data) is a real-time graphical programming environment for audio, video, and graphical processing. It is the third major branch of the family of patcher programming languages known as Max (Max/FTS, ISPW Max, Max/MSP, jMax, etc.) originally developed by Miller Puckette and company at IRCAM. The core of Pd is written and maintained by Miller Puckette and includes the work of many developers, making the whole package very much a community effort.</p>
+<h2><span class="mw-headline" id="Prep.2FBring">Prep/Bring</span></h2>
+<ul>
+<li>bring a computer with working sound subsystem and Pd-extended installed.
+<ul>
+<li>Headphones might be nice!</li>
+<li>Tabletop/mini amplifier might be nice.</li>
+</ul>
+</li>
+<li>If your prefer to install externals yourself, install Pd-vanilla.
+<ul>
+<li><a rel="nofollow" class="external free" href="http://puredata.info/downloads">http://puredata.info/downloads</a></li>
+</ul>
+</li>
+</ul>
+<h2><span class="mw-headline" id="Course_Outline">Course Outline</span></h2>
+<p><b>NOTE</b> This is a work in progress.</p>
+<h3><span class="mw-headline" id="phase_1:_examples.2Finspiration_.28.7E15_minutes.29">phase 1: examples/inspiration (~15 minutes)</span></h3>
+<ul>
+<li>show some example projects done in pd
+<ul>
+<li>pure-software example</li>
+<li>example with hardware</li>
+<li>killer one-liner</li>
+</ul>
+</li>
+</ul>
+<h3><span class="mw-headline" id="phase_2:_pd_primer_.28.7E15_minutes.29">phase 2: pd primer (~15 minutes)</span></h3>
+<ul>
+<li>history and comparisons to Max</li>
+<li>basics of visual language</li>
+<li>basics of dataflow, relative to other languages
+<ul>
+<li>what is this? the picture is the program.</li>
+</ul>
+</li>
+<li>the Pd help system</li>
+</ul>
+<h3><span class="mw-headline" id="phase_3:_basics">phase 3: basics</span></h3>
+<ul>
+<li>primitive data types
+<ul>
+<li>float, bang, list, message, signal</li>
+</ul>
+</li>
+<li>basic graphical objects:
+<ul>
+<li>bang</li>
+<li>toggles
+<ul>
+<li>properties dialog</li>
+</ul>
+</li>
+<li>number box</li>
+<li>message box</li>
+<li>sliders</li>
+<li>object box
+<ul>
+<li>[print]
+<ul>
+<li>creation arguments</li>
+<li>hook above into print</li>
+</ul>
+</li>
+<li>[osc~]
+<ul>
+<li>creation arguments</li>
+<li>differences between audio and signal graphs (and what that means)</li>
+</ul>
+</li>
+<li>[dac~]
+<ul>
+<li>Ouch, that's loud -- how to control it</li>
+<li>[*~] and slider</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><span class="mw-headline" id="phase_4:_learn_how_to_build_a_counter">phase 4: learn how to build a counter</span></h3>
+<ul>
+<li>
+<ul>
+<li>[float]</li>
+<li>[+]
+<ul>
+<li>now is a good time to show the help for [+] etc</li>
+</ul>
+</li>
+<li>hot/cold inlets</li>
+</ul>
+</li>
+</ul>
+<h3><span class="mw-headline" id="phase_5:_outlet_ordering">phase 5: outlet ordering</span></h3>
+<ul>
+<li>outlet ordering</li>
+<li>how to do 1 / x?
+<ul>
+<li>[trigger] to the rescue</li>
+</ul>
+</li>
+</ul>
+<h3><span class="mw-headline" id="phase_6:_putting_it_together">phase 6: putting it together</span></h3>
+<ul>
+<li>[mod]</li>
+<li>[select]</li>
+<li>wire counter to oscillator</li>
+<li>we have made a simple sequencer</li>
+<li>[mtof]</li>
+<li>introducing [metro]</li>
+<li>introducing [vline~] (for notes, volume)</li>
+<li>[spigot]</li>
+<li>[route]</li>
+</ul>
+<h3><span class="mw-headline" id="Bonus:_If_time_allows....">Bonus: If time allows....</span></h3>
+<ul>
+<li>delread~, delwrite~, vd~</li>
+<li>env~</li>
+<li>lop~</li>
+<li>hip~</li>
+<li>bp~</li>
+<li>phasor~, signal~</li>
+<li>send, receive (throw~/catch~)</li>
+<li>tabread, tabwrite</li>
+<li>tables and arrays</li>
+<li>abstractions and sub-patches</li>
+<li>GOP</li>
+</ul>
+<h3><span class="mw-headline" id="where_to_find_more:">where to find more:</span></h3>
+<ul>
+<li>assemble and provide:
+<ul>
+<li>concise links to free/online books/tutorials
+<ul>
+<li><a rel="nofollow" class="external free" href="http://en.flossmanuals.net/puredata">http://en.flossmanuals.net/puredata</a></li>
+<li><a rel="nofollow" class="external free" href="http://www.pd-tutorial.com/english/index.html">http://www.pd-tutorial.com/english/index.html</a></li>
+<li><a rel="nofollow" class="external free" href="http://www.youtube.com/playlist?list=PL12DC9A161D8DC5DC&amp;feature=plcp">http://www.youtube.com/playlist?list=PL12DC9A161D8DC5DC&amp;feature=plcp</a></li>
+<li><a rel="nofollow" class="external free" href="http://dorkbotpdx.org/files/pddptutorial.zip">http://dorkbotpdx.org/files/pddptutorial.zip</a></li>
+</ul>
+</li>
+<li><a rel="nofollow" class="external free" href="http://puredata.info/">http://puredata.info/</a></li>
+<li><a rel="nofollow" class="external free" href="http://lists.puredata.info/listinfo/pd-list">http://lists.puredata.info/listinfo/pd-list</a> email list</li>
+</ul>
+</li>
+</ul>
+

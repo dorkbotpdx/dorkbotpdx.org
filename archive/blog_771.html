@@ -1,0 +1,211 @@
+Standalone (Txtzyme) Sparkles
+2011-07-10 16:27:22
+paul
+
+At the Open Source Bridge hacker lounge, Ward Cunningham was talking about borrowing a Mac Mini to run his <a href="http://www.dorkbotpdx.org/blog/wardcunningham/txtzyme_sparkles_on_led_matrix">Txtzyme Sparkles</a> at an art show.
+
+<img src="http://dorkbotpdx.org/files/images/txtzyme_sparkle.jpg">
+
+Rather than go home at a reasonable hour, I thought it'd be fun to try implementing all the math directly on the Teensy++, using only the Arduino IDE.  Making it run was easy, but doing the math as fast as the computer+USB was quite a challenge.
+
+"Read more" for the stand alone Arduino-based code.... which can run as fast, even faster than the USB communication allows.
+<!--break-->
+
+<a href="https://github.com/WardCunningham/Txtzyme/blob/master/projects/matrix/uno.pl">Here is Ward's Perl code</a>, which this little hack tries to replicate directly on Teensy++ (only a 16 MHz 8 bit processor)
+
+This first attempt, using floating point numbers as Perl does, with nearly identical math simply converted to Arduino worked.... SLOWLY.  It was very slow indeed, but converting the code only took maybe 15 or 20 minutes.
+
+<pre>
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>setup</b></span>() {
+}
+<span style="color: #CC6600;">float</span> rn(<span style="color: #CC6600;">void</span>) {
+&nbsp;&nbsp;<span style="color: #CC6600;">long</span> r = <span style="color: #CC6600;">random</span>(0, 200000) + <span style="color: #CC6600;">random</span>(0, 200000) +
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">random</span>(0, 200000) + <span style="color: #CC6600;">random</span>(0, 200000);
+&nbsp;&nbsp;<span style="color: #CC6600;">return</span> r * 0.00001;
+}
+<span style="color: #CC6600;">byte</span> anode[] = {42, 15, 14, 39, 12, 40, 44, 45};
+<span style="color: #CC6600;">byte</span> cathode[] = {38, 43, 10, 41, 17, 11, 16, 13};
+<span style="color: #CC6600;">char</span> x=0, y=0;
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>loop</b></span>() {
+&nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">float</span> t=0;
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (x &gt;= 0 &amp;&amp; x &lt;= 7 &amp;&amp; y &gt;= 0 &amp;&amp; y &lt;= 7) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(anode[x], <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(anode[x], <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(cathode[y], <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(cathode[y], <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">delayMicroseconds</span>(50);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> xold = x;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> yold = y;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(anode[xold], <span style="color: #006699;">INPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(cathode[yold], <span style="color: #006699;">INPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&nbsp;rn()&nbsp;+&nbsp;3.0&nbsp;*&nbsp;<span style="color: #CC6600;">sin</span>(7.7 * t);
+&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;=&nbsp;rn()&nbsp;+&nbsp;3.0&nbsp;*&nbsp;<span style="color: #CC6600;">cos</span>(3.1 * t);
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> {
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&nbsp;rn()&nbsp;+&nbsp;3.0&nbsp;*&nbsp;<span style="color: #CC6600;">sin</span>(7.7 * t);
+&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;=&nbsp;rn()&nbsp;+&nbsp;3.0&nbsp;*&nbsp;<span style="color: #CC6600;">cos</span>(3.1 * t);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;t&nbsp;=&nbsp;t&nbsp;+&nbsp;0.0002;
+}
+</pre>
+
+
+Throughout the evening, I tried many ideas and eventually replaced all the floating point math with 32 bit integers.  Ward suggested using a short loopup table for the sine/cosine, since it only needs to be accurate to a little over 3 bits to determine which of the 8 rows or columns to light.
+
+Eliminating the floats helped, but it was still far too slow.   After much experimentation, it turned out the random number function from Arduino was very slow, and it was being called 4 times to get a nice distribution.  Ward suggested just using a lookup table there too.  It turns out that code does a 32 bit modulus operation internally, which is slow looped code within the C library.  Progress.
+
+Now it was almost as fast, but still not quite there.  Here's the fixed point code with tables for sine/cosine and random.
+
+<pre>
+<span style="color: #CC6600;">char</span> sn[128];
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> nrnd=333;
+<span style="color: #CC6600;">byte</span> rnd[nrnd];
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>setup</b></span>() {
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> i; i&lt;128; i++) {
+&nbsp;&nbsp;&nbsp;&nbsp;sn[i]&nbsp;=&nbsp;96*<span style="color: #CC6600;">sin</span>(i*2*3.14159/128);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> i; i&lt;nrnd; i++) {
+&nbsp;&nbsp;&nbsp;&nbsp;rnd[i]&nbsp;=&nbsp;rn();
+&nbsp;&nbsp;}
+}
+<span style="color: #CC6600;">int</span> rn(<span style="color: #CC6600;">void</span>) {
+&nbsp;&nbsp;<span style="color: #CC6600;">int</span> r = <span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;r&nbsp;+=&nbsp;<span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;r&nbsp;+=&nbsp;<span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;r&nbsp;+=&nbsp;<span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;<span style="color: #CC6600;">return</span> r &gt;&gt; 2;
+}
+<span style="color: #CC6600;">byte</span> anode[] = {42, 15, 14, 39, 12, 40, 44, 45};
+<span style="color: #CC6600;">byte</span> cathode[] = {38, 43, 10, 41, 17, 11, 16, 13};
+<span style="color: #CC6600;">char</span> x=0, y=0;
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>loop</b></span>() {
+&nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">long</span> i1=0, i2=0;
+&nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">int</span> rindex=0;
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (x &gt;= 0 &amp;&amp; x &lt;= 7 &amp;&amp; y &gt;= 0 &amp;&amp; y &lt;= 7) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(anode[x], <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(anode[x], <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(cathode[y], <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(cathode[y], <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">delayMicroseconds</span>(50);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> xold = x;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> yold = y;
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&nbsp;(rnd[rindex]&nbsp;+&nbsp;sn[i1&gt;&gt;25])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(anode[xold], <span style="color: #006699;">INPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(cathode[yold], <span style="color: #006699;">INPUT</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;=&nbsp;(rnd[rindex+1]&nbsp;+&nbsp;sn[((i2&gt;&gt;25)+32)&amp;127])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> {
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&nbsp;(rnd[rindex]&nbsp;+&nbsp;sn[i1&gt;&gt;25])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;=&nbsp;(rnd[rindex+1]&nbsp;+&nbsp;sn[((i2&gt;&gt;25)+32)&amp;127])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;i1&nbsp;=&nbsp;i1&nbsp;+&nbsp;526335;
+&nbsp;&nbsp;i2&nbsp;=&nbsp;i2&nbsp;+&nbsp;211913;
+&nbsp;&nbsp;rindex&nbsp;=&nbsp;rindex&nbsp;+&nbsp;1;
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (rindex &gt;= nrnd - 2) rindex = 0;
+}
+</pre>
+
+The final bit of slowness, after much more hacking, turned out to be the right shift by 25 bits.
+
+In the float to integer conversion, I replaced the float with a 32 bit long, and intead of incrementing the float by 0.0002, I incremented two separate integers by 526335 and 211913.  That caused the top 7 bits to sweep exactly once through the table for the same number of iterations of the loop as the float code would sweep from 0 to 2*pi.  The 32 bit number would overflow back to 0 exactly as the original code became 6.2831853 (each integrating the 7.7 and 3.1 scale factors into the integer addition), which perfectly leveraged integer overflow.  Crafty, but still too slow!!
+
+It turned out the compiler was using a slow loop to implement the 25 bit right shift.  I changed it to 24 bits, by adding half as much each time through the loop.  After a quick fix to mask off the top bit, for 31 bit integer overflow, suddenly the Arduino-based code could run MUCH FASTER than Txtzyme could receive and process commands from the Mac.
+
+Along the way, I also removed the pinMode and digitalWrite and replaced them with case statements.  That runs faster, but only a tiny increase.
+
+With all the optimizations in place, Ward and I spent a little time (as midnight approached) tweaking at extra delayMicroseconds() to make the stand-alone version closely match the speed of Txtyzme with the Perl script.  Here is that final "same speed" code, with the 72 us delay.
+
+<pre>
+<span style="color: #CC6600;">char</span> sn[128];
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> nrnd=333;
+<span style="color: #CC6600;">byte</span> rnd[nrnd];
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>setup</b></span>() {
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> i; i&lt;128; i++) {
+&nbsp;&nbsp;&nbsp;&nbsp;sn[i]&nbsp;=&nbsp;96*<span style="color: #CC6600;">sin</span>(i*2*3.14159/128);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> i; i&lt;nrnd; i++) {
+&nbsp;&nbsp;&nbsp;&nbsp;rnd[i]&nbsp;=&nbsp;rn();
+&nbsp;&nbsp;}
+}
+<span style="color: #CC6600;">int</span> rn(<span style="color: #CC6600;">void</span>) {
+&nbsp;&nbsp;<span style="color: #CC6600;">int</span> r = <span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;r&nbsp;+=&nbsp;<span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;r&nbsp;+=&nbsp;<span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;r&nbsp;+=&nbsp;<span style="color: #CC6600;">random</span>() &amp; 0xFF;
+&nbsp;&nbsp;<span style="color: #CC6600;">return</span> r &gt;&gt; 2;
+}
+<span style="color: #CC6600;">byte</span> anode[] = {42, 15, 14, 39, 12, 40, 44, 45};
+<span style="color: #CC6600;">byte</span> cathode[] = {38, 43, 10, 41, 17, 11, 16, 13};
+<span style="color: #CC6600;">char</span> x=0, y=0;
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>loop</b></span>() {
+&nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">long</span> i1=0, i2=0;
+&nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">int</span> rindex=0;
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (x &gt;= 0 &amp;&amp; x &lt;= 7 &amp;&amp; y &gt;= 0 &amp;&amp; y &lt;= 7) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(x) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF |= (1&lt;&lt;4); DDRF |= (1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTC |= (1&lt;&lt;5); DDRC |= (1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC |= (1&lt;&lt;4); DDRC |= (1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF |= (1&lt;&lt;1); DDRF |= (1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC |= (1&lt;&lt;2); DDRC |= (1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTF |= (1&lt;&lt;2); DDRF |= (1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTF |= (1&lt;&lt;6); DDRF |= (1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTF |= (1&lt;&lt;7); DDRF |= (1&lt;&lt;7); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//digitalWrite(anode[x], HIGH);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//pinMode(anode[x], OUTPUT);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(y) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;0); DDRF |= (1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTF &amp;= ~(1&lt;&lt;5); DDRF |= (1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;0); DDRC |= (1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;3); DDRF |= (1&lt;&lt;3); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;7); DDRC |= (1&lt;&lt;7); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTC &amp;= ~(1&lt;&lt;1); DDRC |= (1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTC &amp;= ~(1&lt;&lt;6); DDRC |= (1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTC &amp;= ~(1&lt;&lt;3); DDRC |= (1&lt;&lt;3); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//digitalWrite(cathode[y], LOW);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//pinMode(cathode[y], OUTPUT);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">delayMicroseconds</span>(50);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> xold = x;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> yold = y;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(xold) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;4); DDRF &amp;= ~(1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTC &amp;= ~(1&lt;&lt;5); DDRC &amp;= ~(1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;4); DDRC &amp;= ~(1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;1); DDRF &amp;= ~(1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;2); DDRC &amp;= ~(1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTF &amp;= ~(1&lt;&lt;2); DDRF &amp;= ~(1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTF &amp;= ~(1&lt;&lt;6); DDRF &amp;= ~(1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTF &amp;= ~(1&lt;&lt;7); DDRF &amp;= ~(1&lt;&lt;7); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//pinMode(anode[xold], INPUT);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(yold) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;0); DDRF &amp;= ~(1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTF &amp;= ~(1&lt;&lt;5); DDRF &amp;= ~(1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;0); DDRC &amp;= ~(1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;3); DDRF &amp;= ~(1&lt;&lt;3); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;7); DDRC &amp;= ~(1&lt;&lt;7); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTC &amp;= ~(1&lt;&lt;1); DDRC &amp;= ~(1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTC &amp;= ~(1&lt;&lt;6); DDRC &amp;= ~(1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTC &amp;= ~(1&lt;&lt;3); DDRC &amp;= ~(1&lt;&lt;3); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//pinMode(cathode[yold], INPUT);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&nbsp;(rnd[rindex]&nbsp;+&nbsp;sn[(i1&gt;&gt;24)&amp;127])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;=&nbsp;(rnd[rindex+1]&nbsp;+&nbsp;sn[((i2&gt;&gt;24)+32)&amp;127])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> {
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&nbsp;(rnd[rindex]&nbsp;+&nbsp;sn[(i1&gt;&gt;24)&amp;127])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;=&nbsp;(rnd[rindex+1]&nbsp;+&nbsp;sn[((i2&gt;&gt;24)+32)&amp;127])&nbsp;&gt;&gt;&nbsp;5;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;i1&nbsp;=&nbsp;i1&nbsp;+&nbsp;(526335/2);
+&nbsp;&nbsp;i2&nbsp;=&nbsp;i2&nbsp;+&nbsp;(211913/2);
+&nbsp;&nbsp;rindex&nbsp;=&nbsp;rindex&nbsp;+&nbsp;1;
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (rindex &gt;= nrnd - 2) rindex = 0;
+&nbsp;&nbsp;<span style="color: #CC6600;">delayMicroseconds</span>(72);
+}
+</pre>
+
+So there it is, right at the end, an extra 72 us delay needed to match the original speed....
+
+Of course, this was pretty difficult to optimize for speed, and that was with the Txtyzme version already fully developed.  The ease to just editing a tiny bit of Perl and getting a dramatically different display is pretty amazing.
+
+There were also some slight visual artifacts, probably from using the lookup tables.  A big improvement, which wouldn't take much CPU time, would involve getting the 2 sets of random numbers from the table by incrementing different number of positions in the table, maybe 2 different prime numbers?  Or longer tables could be used, since there's lots of unused RAM, and they could be put in flash using PROGMEM.
+
+But this was really just quick hacking, late at the Open Source Bridge hacker lounge... all done from about 9pm to midnight on the open Tuesday session.  I'm not sure if Ward is planning to use this or write any more about it (or make videos comparing them??), or really if anyone might ever find this optimization stuff interesting, but there is it anyway.

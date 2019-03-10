@@ -1,0 +1,58 @@
+Teensy as a Benito
+2009-06-09 17:35:52
+paul
+
+I released a new version of <a href="http://www.pjrc.com/teensy/td_download.html">Teensyduino</a> today, which adds USB-serial extensions to the Arduino Serial object.  Now it's possible to use the Teensy via the Arduino IDE for in sorts of new ways.
+
+For example, the Teensy can be programmed to work as a Benito.
+
+<img src="http://www.pjrc.com/teensy/teensy_benito.jpg">
+
+Here is the simple sketch that makes it work.....
+<!--break-->
+
+<hr>
+<pre>
+#define RESET_PIN 4
+<span style="color: #CC6600;">unsigned</span> <span style="color: #996600;">long</span> baud = 19200;
+HardwareSerial Uart = HardwareSerial();
+
+<span style="color: #CC6600;">void</span> <span style="color: #993300;"><b>setup</b></span>()
+{
+        <span style="color: #996600;">digitalWrite</span>(RESET_PIN, <span style="color: #CC0000;">HIGH</span>);
+        <span style="color: #996600;">pinMode</span>(RESET_PIN, <span style="color: #CC0000;">OUTPUT</span>);
+        <span style="color: #996600;">Serial</span>.<span style="color: #996600;">begin</span>(baud);   <span style="color: #777755;">// USB, communication to PC or Mac</span>
+        Uart.<span style="color: #996600;">begin</span>(baud);  <span style="color: #777755;">// UART, communication to Dorkboard</span>
+}
+
+<span style="color: #CC6600;">void</span> <span style="color: #993300;"><b>loop</b></span>()
+{
+        <span style="color: #CC6600;">unsigned</span> <span style="color: #996600;">char</span> c, dtr;
+        <span style="color: #CC6600;">static</span> <span style="color: #CC6600;">unsigned</span> <span style="color: #996600;">char</span> prev_dtr = 0;
+
+        <span style="color: #CC6600;">if</span> (<span style="color: #996600;">Serial</span>.baud() != baud) {
+                baud = <span style="color: #996600;">Serial</span>.baud();
+                Uart.<span style="color: #996600;">begin</span>(baud);
+        }
+        <span style="color: #CC6600;">if</span> (<span style="color: #996600;">Serial</span>.<span style="color: #996600;">available</span>()) {
+                c = <span style="color: #996600;">Serial</span>.<span style="color: #996600;">read</span>();
+                Uart.<span style="color: #996600;">write</span>(c);
+        }
+        <span style="color: #CC6600;">if</span> (Uart.<span style="color: #996600;">available</span>()) {
+                c = Uart.<span style="color: #996600;">read</span>();
+                <span style="color: #996600;">Serial</span>.<span style="color: #996600;">write</span>(c);
+        }
+        dtr = <span style="color: #996600;">Serial</span>.dtr();
+        <span style="color: #CC6600;">if</span> (dtr && !prev_dtr) {
+                <span style="color: #996600;">digitalWrite</span>(RESET_PIN, <span style="color: #CC0000;">LOW</span>);
+                <span style="color: #996600;">delay</span>(1);
+                <span style="color: #996600;">digitalWrite</span>(RESET_PIN, <span style="color: #CC0000;">HIGH</span>);
+        }
+        prev_dtr = dtr;
+}
+</pre>
+<hr>
+
+It's also possible to use this on a real Benito board.  Here is a link to the HEX file, which can be loaded onto a Benito using the "DFU Loader".
+
+http://www.pjrc.com/teensy/Teensy_Benito.hex

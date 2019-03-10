@@ -1,0 +1,17 @@
+Morse Code XMas Lights w/ Message Submission!
+2009-05-07 22:39:06
+skinny
+
+<object type="application/x-shockwave-flash" width="400" height="300" data="http://www.flickr.com/apps/video/stewart.swf?v=71377" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"> <param name="flashvars" value="intl_lang=en-us&photo_secret=989c1ce790&photo_id=3511575789"></param> <param name="movie" value="http://www.flickr.com/apps/video/stewart.swf?v=71377"></param> <param name="bgcolor" value="#000000"></param> <param name="allowFullScreen" value="true"></param><embed type="application/x-shockwave-flash" src="http://www.flickr.com/apps/video/stewart.swf?v=71377" bgcolor="#000000" allowfullscreen="true" flashvars="intl_lang=en-us&photo_secret=989c1ce790&photo_id=3511575789" height="300" width="400"></embed></object>
+
+You can add messages <a href="http://bzztbomb.com/dotdash/">here</a>.<br>
+
+<!--break-->
+
+I know I can't be the first one to do this, but I did it anyways. The pieces (with source) involved are:
+
+<ul>
+<li><a href="http://dorkbotpdx.org/files/index.php_.txt">PHP script</a> on the server to accumulate messages to display</li>
+<li>A <a href="http://dorkbotpdx.org/files/morse.py_.txt">Python</a> <a href="http://dorkbotpdx.org/files/gentable.py_.txt">script</a> that polls the webserver and grabs new messages. Then it sends it to an old Arduino I have laying around.</li>
+<li>An arduino + <a href="http://dorkbotpdx.org/files/dotdash.txt">sketch</a> with a relay to control the xmas lights</li>
+</ul>

@@ -1,0 +1,30 @@
+Txtzyme Javascope Feeds Java's 2D Graphics
+2010-06-13 09:28:02
+WardCunningham
+
+<p>In my last post I described plotting <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> output with a <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/plotting_signals_with_txtzyme">perl one-liner</a>. I wondered, can I do better with a real graphics library? I was looking for something portable, like GD, but chose the already installed Graphics2D in Java 5 for convenience.</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/TxtzymeJavascope.png'/></p>
+<p>As a once Tektronix engineer I have strong opinions about what a waveform should look like. I'm pleased with the look I get with Graphics2D. I would have never thought that the joint and end-cap choices would matter, but they do, and anti-aliasing is a must also.</p>
+<p>Once Scope.java is running and listening to a Teensy, one has only to send data-generating Txtzyme nano-programs down the other way to light the screen with waveforms.</p>
+<p>Here is an included script called Timebase.sh that does exactly this, alternating between real-time and equivalent-time acquisition of my favorite source, 60Hz hum.</p>
+<dl>
+<dd>while true
+<dl>
+<dd>do echo _slow_6d1o500{5sp16m600u}0o &gt;/dev/cu.usbmodem</dd>
+<dd>sleep 10</dd>
+<dd>for i in 1 2 3 4 5 6 7 8 9 10
+<dl>
+<dd>do echo _fast_1o500{5sp}0o &gt;/dev/cu.usbmodem</dd>
+<dd>sleep .348</dd>
+</dl>
+</dd>
+<dd>done</dd>
+</dl>
+</dd>
+<dd>done</dd>
+</dl>
+<p>Scope.java is organized as three separate threads. One reads Txtzyme data, another displays it, and a third handles user-input. Refreshing at 30Hz, Scope.java takes 15% to 25% of my MacBook Pro cpu resources.</p>
+<p>The Javascope <a rel="nofollow" class="external text" href="http://github.com/WardCunningham/Txtzyme/tree/master/projects/javascope/">demo project</a> joins several others in the Txtzyme repo on GitHub.</p>
+<p>Evolved from other projects, <a rel="nofollow" class="external text" href="http://github.com/WardCunningham/Txtzyme/blob/master/projects/javascope/Scope.java">Scope.java</a> is a mixture of about three different coding styles each from a different era. I would love for someone to help me with a code review so I can bring this up-to-date.</p>
+<p><br /></p>
+

@@ -1,0 +1,7 @@
+Arduino SMS device
+2013-12-31 01:25:41
+wade
+
+I'm working on an SMS device that is programmed in the Arduino IDE and uses a tiny chorded keyboard for input, a SIM900 GSM module to accept standard AT commands, and a Nokia5110 LCD to display output. I stopped by earlier this evening and Paul (thanks Paul!) helped me debug. I've posted a thread on the Arduino.cc forum http://forum.arduino.cc/index.php?topic=206415 but basically I'm having trouble getting my sketch to run in the tiny 2K of RAM available on the ATmega328. 
+
+I'm hoping somebody can help me reduce the memory footprint of the GKOS keyboard library found here  http://playground.arduino.cc/Main/GkosMain. I've updated that page to reflect the minor tweaks I had to do to get it to work with Arduino 1.0+ since it hasn't been updated in years. If you have other suggestions I'd be happy to hear them. 

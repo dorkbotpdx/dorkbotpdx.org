@@ -1,0 +1,140 @@
+ Hand-Eye Supply's Starlight Parade Float Wins Award :-)
+2011-06-06 16:38:05
+paul
+
+I recently got involved in helping with the electronics+software for Hand-Eye Supply's Starlight Parade float, designed by Laurence Sarrazin.  It <a href="http://www.kgw.com/lifestyle/2011-Starlight-Parade-winners-announced-123197578.html">won the Parade's "Sweepstakes Award - Best Illumination"</a>!!!  Here's <a href="http://www.oregonlive.com/rosefest/index.ssf/2011/06/2011_starlight_parade_winners.html">more news coverage</a> and <a href="http://www.core77.com/blog/announcements/hand-eye_supply_wins_the_starlight_parade_sweepstakes_award_best_illumination_19524.asp">Core77's announcement</a>, <a href="http://www.core77.com/blog/announcements/hand-eye_supplys_the_creative_spark_team_lights_up_the_starlight_parade_19549.asp">detailed announcement</a> and <a href="http://www.core77.com/blog/announcements/behind-the-scenes_float_building_process_shout_out_19469.asp">Behind-The-Scenes build story</a> (with time lapse video).
+
+<img src="http://www.dorkbotpdx.org/files/images/float2.jpg">
+
+The lighting wasn't very bright, but there were 114 computer controlled circuits.  It was really the only float in the whole parade where the lights "did something" (Robin's description).  Indeed they blinked and faded in lots of complex patterns.
+
+"Read more" for technical details and source code behind this float's lighting, and the crazy story of its construction....
+<!--break-->
+
+The float was designed by <a href="http://laurence.los-osos.com/">Laurence Sarrazin</a> of <a href="http://www.handeyesupply.com/">Hand-Eye Supply</a>.  The whole thing was her artistic vision!
+
+Here's an <a href="http://laurence.los-osos.com/#1411089/Parade-Float-Progress">early blog post with many concept images</a>.  This is the one submitted to the Rose Festival.
+
+<img src="http://www.dorkbotpdx.org/files/images/float_submission_smaller.preview.jpg">
+
+The idea was animation, like <a href="http://vimeo.com/23407308">this video she made</a>.
+
+Laurence talked with Steve who's a Dorkbot regular, who put her in touch with <a href="http://mykle.com/">Mykle</a>.  Of course, Mykle's interested in all types of lighting, and he posted it to the mail list on April 22.  We all met up for the first time on May 9th and agreed on a rough plan involving a number of the Sparkfun el wire controller boards.  All the el wire and controllers arrived on Friday May 13, the day Hand-Eye held a big party to celbrate the launching of the project, or something like that.
+
+I did the electronics and software design part from the 14th to the 19th, and dropped off 2 working controllers and picked up lots of parts that were ordered on the 16th and had just arrived.
+
+Originally Mykle and I had planned to use a perl script (which Mykle would write) to convert an XML export of Laurence's Adobe After Effects animation (eg, the one you see in that video on Vimeo).
+
+Around that time, Laurence decided to switch to the <a href="http://www.doityourselfchristmas.com/wiki/index.php?title=Vixen">Vixen DIY Christmas Lighting Software</a>.  Here's a screenshot of what Vixen looks like:
+
+<img src="http://www.dorkbotpdx.org/files/images/vixen_screenshot2.png">
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic3.jpg">
+
+Vixen comes with plugins to communicate with a number of controllers people have created, and one of them looked particularly promising.... the Renard protocol.  Several controllers have been made with PIC chips to control ordinary incandescent lighting.  None were available for el wire, but the protocol allowed plenty of channels and didn't require super fast baud rates, and supported 255 brightness levels.  So I decided to just program the Sparkfun controllers to accept Renard input.
+
+The Sparkfun el wire controllers were <a href="http://www.dorkbotpdx.org/blog/paul/sparkfun_el_sequencer_trouble">very problematic</a>, but they were pretty much the only off-the-shelf board available.  If I had to do this all over again, I would NOT recommend them.  I'd make my own.
+
+<a href="http://www.dorkbotpdx.org/files/float_code_04.tar_.gz">Here is the firmware I wrote for the Sparkfun boards</a>.  It allows each board to be any 8 channels, between 1-8 to 113-120, by placing jumpers on the header on the left side of the board.  The boards don't come with this header... I added to to each of them.  Here's how the jumpers configured each board.
+
+<img src="http://www.dorkbotpdx.org/files/images/jumper_config.png">
+
+So, with 2 boards talking Renard protocol, on May 20th Laurence began a series of soldering parties.  Here's photos from the first soldering session, held at Hand-Eye Supply's workshop.
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic4.jpg">
+
+(yup, that's me soldering in this next photo... though I can't recall what it was for, maybe a posed shot?)
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic2.jpg">
+
+Here's a photo with a test (done a few days later) with just those first 2 boards.  For about a week, only these first 2 boards were working while I modified all the others.
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic6.jpg">
+
+Mykle began work on a cable harness that would distribute data from a laptop running Vixen to all the el wire controller boards... 15 of them.  Here's a diagram of the harness design.
+
+<img src="http://www.dorkbotpdx.org/files/images/harness.png">
+
+As you can see, the controllers are located in clusters.  I mage a transmitter boards, using a <a href="http://www.pjrc.com/teensy/">Teensy</a> running the <a href="http://dorkbotpdx.org/blog/paul/teensy_as_benito_at_57600_baud">USB to Serial sketch</a>, on a little hand-wired board with an opto coupler (who wants to hook a nice Mac laptop to a system of 15 high voltage el wire inverters?) and a 5 volt power supply, and buffer with poor-mans slew rate limiting (resistor-capacitor filter) to drive the long cable.
+
+<img src="http://www.dorkbotpdx.org/files/images/temp/electronic1.jpg">
+
+Somewhere shortly after the 20th, construction moved to <a href="http://www.adxportland.com/">ADX</a> - which is a great space for building up a big project like this.
+
+<a href="http://www.flickr.com/photos/artdesignpdx/5791657285/"><img src="http://www.dorkbotpdx.org/files/images/adx.jpg" border=0></a>
+
+Here's a photo of one of the early soldering parties at ADX.
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic5.jpg">
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic5a.jpg">
+
+Here's a photo from May 29th, as the bamboo pieces were starting to be assembled, and the steel which would be welded into the entire frame of the float had just arrived...
+
+<img src="http://www.dorkbotpdx.org/files/images/float_29may11b.jpg">
+
+The electronics were all delivered on May 23rd for a full system test.  There was a last minute problem with the cable, so only 2 boards were able to receive communication on the 23rd.  Here's that test, where I'm checking to see if the Sparkfun boards are having more troubles.
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic7.jpg">
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic8.jpg">
+
+Mykle made some changes to the cable, and on May 24 the entire electronics package was verified to be working.  I believe this was the only time, except for only an hour before the parade, where all the el wire was actually hooked up!
+
+<img src="http://www.dorkbotpdx.org/files/images/electronic9.jpg">
+
+Building a float is a lot of work!!!  I wasn't really involved in the construction much, until the weekend of the parade.  Laurence had quite a crew of dedicated volunteers, many of them students from the art institute.  They put in a lot of work building the whole thing.
+
+<a href="http://www.flickr.com/photos/artdesignpdx/5792220756/"><img src="http://www.dorkbotpdx.org/files/images/construct1.jpg" border=0></a>
+
+<a href="http://www.flickr.com/photos/artdesignpdx/5792220322/"><img src="http://www.dorkbotpdx.org/files/images/construct2.jpg" border=0></a>
+
+<a href="http://www.flickr.com/photos/artdesignpdx/5791662659/"><img src="http://www.dorkbotpdx.org/files/images/construct5.jpg" border=0></a>
+
+Not only did they build a huge number of these flowing structures from bamboo, but the entire frame of the float was welded together from raw steel.  Pretty amazing.  I wasn't involved in any of this part.  These photos were taken by ADX.
+
+<a href="http://www.flickr.com/photos/artdesignpdx/5792217092/"><img src="http://www.dorkbotpdx.org/files/images/construct3.jpg" border=0></a>
+
+<a href="http://www.flickr.com/photos/artdesignpdx/5792217548/"><img src="http://www.dorkbotpdx.org/files/images/construct4.jpg" border=0></a>
+
+I stopped by on Thursday, June 2nd (2 days before the parade), and June 3rd (the night before, while ADX was having a huge grand opening party).  Robin & I met there, I dropped off some parts and we had dinner out.  Robin being so understanding about projects like this was ok with me staying there after our dinner out and working on it pretty late.
+
+Here we are right before going out to dinner, and Robin's really hungry and waiting while we try to figure out how the electronics will attach!
+
+<a href="http://www.flickr.com/photos/artdesignpdx/5805823651/"><img src="http://www.dorkbotpdx.org/files/images/friday.jpg" border=0></a>
+
+I went by Saturday (the date of the parade) and helped from about noon until the parade.  Most of the lights were on the float, but none wired to the controllers, which had just been mounted that morning!  I spent much of the time getting Mykle's cable connected, and one of the groups of controllers had to be remounted for the cable to reach.  It's amazing how many little things all need to be solved.
+
+As things wrapped up at ADX late in the afternoon, we lit up the lights for the first time actually on the float, and it was indeed an awesome moment seeing it was indeed going to work, even if less than half had been wired in by that point.
+
+Getting the float from ADX to the parade staging are was another adventure... one for some else to write........ Here's a photo of the last part I saw at ADX, as it was being wheeled out onto the street to be (somehow) attached to a truck.
+
+<img src="http://www.dorkbotpdx.org/files/images/rigging2.jpg">
+
+I actually left as they were hooking it to a truck to go meet up with Robin in NW for dinner near the parade.  The brought it across the river to the parade staging area while Robin and I had dinner.
+
+<img src="http://www.dorkbotpdx.org/files/images/rigging3.jpg">
+
+We both helped, and in those last few hours and amazing number of wires were all attached....  Beer was consumed too.  :-)
+
+<img src="http://www.dorkbotpdx.org/files/images/staging1.jpg">
+
+Tobias had created a number of sequences in Vixen.  Sadly, there hadn't been any time to test them with the wires attached, and efforts to map out which wires were on which channels just weren't feasible in the daylight.  El wire just isn't really bright.  Still, it was pretty impressive, if much more randomly flashing than the animations Laurence had originally envisioned.
+
+<img src="http://www.dorkbotpdx.org/files/images/staging2.jpg">
+
+With everything in place, Robin and I left and walked a few blocks to the beginning of the parade and set up a couple camping chair Robin had packed.  We had a pretty good view.
+
+Just as the parade was starting and the first couple (of many) marching bands went by, my phone rang.  The computer had crashed and the float wasn't working.  I ran back.  It was a mac and Windows was running in a virtual machine, so at least the host OS was fine.  Somehow Windows had crashed.  Some fiddling, plugging in to the different ports and installing drivers fixed the problem.
+
+I returned to Robin and as the parade went by, I was a little worried it wasn't dark enough for the el wire.  Luckily, Hand-Eye Supply was #82 in the parade, so they entered around 9:30 and it was quite a bit darker by them.  It still wasn't nearly as bright, but the lights did flash and fade in lots of patterns.
+
+<iframe width="425" height="349" src="http://www.youtube.com/embed/xUBHfraGMEk?hl=en&fs=1" frameborder="0" allowfullscreen></iframe>
+
+With so much coming together so quickly in just a few weeks, with all those wires connected within hours of the parade, I was pretty amazed it worked.  Then today, Mykle emailed the KGW story that Hand-Eye Supply's float <a href="http://www.kgw.com/lifestyle/2011-Starlight-Parade-winners-announced-123197578.html">won the 1st place award</a>!!  :-)
+
+<img src="http://www.dorkbotpdx.org/files/images/starlight_072.jpg">
+
+<img src="http://www.dorkbotpdx.org/files/images/float3.jpg">
+
+(if anyone has more photos, please email them to me, paul at pjrc dot com, and I'll add them to this blog post)

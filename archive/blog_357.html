@@ -1,0 +1,19 @@
+Using the dorkboard with other peoples programmers.
+2009-05-21 13:38:46
+
+
+When I developed the dorkboard I was working in conjunction with brian riley and paul badger. The dorkboard was an attempt to take the things I liked about the original really bare bones <span style="text-decoration: line-through;">arduino</span>freeduino and refine them. Although I intended my design to be used with my programmer I tried to make it compatible with brian rileys programmers and the programming header pins are ordered according to the standard that paul and brian were working on. I will try to clarify some of this and show you how to use the  dorkboard with other programmers.
+<h2>DTR and the Auto Reset Hack.</h2>
+The ftdi chipset that the arduino community adopted presetnts the dtr signal by default. The underlying standerd asserts dtr whenever a host computer begins to talk to a usb serial device. The device aserts dtr by pulling this signal low. If you pass this signal through a .1uf capacitor it gives you the pulse below.
+
+<img class="alignnone" src="http://farm3.static.flickr.com/2468/3552514364_919fff07da.jpg?v=0" alt="http://farm3.static.flickr.com/2468/3552514364_919fff07da.jpg?v=0" />
+
+The benito produces a straight pulse which is suitable to reset the avr directly.
+<h2>The Dorkboard reset jumper.</h2>
+The dorkboard was designed to work with either system. To use the dorkboard with the benito you simply jumper the reset directly using the solder jumper at the bottom corner of the board.
+
+<img class="alignnone" src="http://farm4.static.flickr.com/3596/3552470118_1480fc8443.jpg?v=0" alt="http://farm4.static.flickr.com/3596/3552470118_1480fc8443.jpg?v=0" />
+
+The pads of the jumper were designed to also accomodate a surface mount capaciter of the 805 size such as part <a href="http://search.digikey.com/scripts/DkSearch/dksus.dll?lang=en&amp;site=US&amp;KeyWords=399-1168-1-ND&amp;x=0&amp;y=0" target="_blank">399-1168-1-ND</a> from digikey . If you are using a programmer which just presents the dtr pulse then you simply solder the cap to the two pads as shown below.
+
+<img src="http://farm4.static.flickr.com/3353/3551467825_30fdc59e03.jpg?v=0" alt="" width="500" height="375" />

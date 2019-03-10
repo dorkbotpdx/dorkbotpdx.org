@@ -1,0 +1,578 @@
+Pirate Ship Fire Sequencer
+2011-08-23 12:35:35
+paul
+
+Recently I built electronics for <a href="http://www.facebook.com/lostmachine">Lostmachine Andy</a>'s fire effects on his awesome <a href="http://www.lostmachine.com/blog/">pirate ship</a> for Burning Man.
+
+<center><img src="http://www.dorkbotpdx.org/files/images/pirateshipfire1.jpg"></center>
+
+<center><img src="http://www.dorkbotpdx.org/files/images/pirateshipfire_concept.jpg"></center>
+
+"Read more" for technical details....
+
+<!--break-->
+
+To get a better idea of Andy's amazing Pirate Ship project, check out the <a href="http://www.kickstarter.com/projects/127652446/finish-the-cs-tere">video on his kickstarter page</a>.  The <b>info about the fire effects starts at 2:58</b> into the video.
+
+Here is a video where 1 of the 8 fire nozzels was tested in Andy's driveway!
+
+<iframe width="576" height="432" src="http://www.youtube.com/embed/t2C4wwPY2to?rel=0" frameborder="0" allowfullscreen></iframe>
+
+My little piece of this huge project is the circuit board, which you can see in the center of this nice metal box Andy machined.
+
+<img src="http://www.dorkbotpdx.org/files/images/pirateshipfire2.jpg">
+
+Here are images of the circuit board.
+
+<img src="http://www.dorkbotpdx.org/files/images/valvesw_top.png">
+
+
+The 8 solenoid valves connect on the top edge.  Eight manual fire pushbuttons connect on the bottom edge.  Those pushbuttons directly turn on the transistor for each valve.  Of course, the software running on a Teensy 2.0 can control the valves too.  There's inputs for 4 buttons and 2 knobs to the software.  There's a place to plug in a 16x2 LCD, which shows info about the sequence to be used.
+
+<img src="http://www.dorkbotpdx.org/files/images/valvesw_bottom.png">
+
+Circuitry-wise, the board is pretty simple.  There's a big P-channel mosfet at the input, acting as a diode to protect against reverse polarity power.  Each valve draws about 1.5 amps, so at 12 amps, a regular diode didn't seem like a good idea.  In the center is a Teensy 2.0 board in sockets, and to the right is a LM7805 regulator.  The 5 volt power to the 2 knobs goes through little PTC fuses.  The knobs and buttons just wire into analog and digital pins, through some little R-C filters, just in case there's any radio frequency noise pickup.  Since I'm not going to Burning Man this year and can't be there to troubleshoot, I wanted to play it safe (and it only takes a few extra cheap parts).
+
+On the top edge are the 8 transistor circuits.  There too, I decided to play things safe, perhaps a bit overly cautious?  The valves are switched with IRFR5305 P-channel mosfets.  Rated at 31 amps, 55 volts, they're a bit overkill.  Then again, I wanted to make sure they wouldn't get hot, so their on resistance of 0.065 ohms is nice.  At 1.5 amps, that ought to be 0.15 watts, which isn't much at all for a package with a metal tab.  A lesser transistor would have worked, but might have needed a heatsink.  This PCB was made at Sunstone and just barely fit into 9 square inches.  Using heatsinks would have bumped the cost up to the next bracket, which is a lot more than the cost of these nicer transistors.
+
+<img src="http://www.dorkbotpdx.org/files/images/pirateshipfire3.jpg">
+
+Andy was concerned about the valves switching quickly.  So for the back-EMF catch diode, I used a B130 schottky in series with a 12 volt, 3 watt zener.  That lets the valve create -12 volts while discharging, so it ought to switch from on-to-off about as far as off-to-on.  We talked a bit about possibly using a very complex approach where the valves might be driven with about 50 volts until they get up to the correct current, and then sustain at the rated 12 volts.  Yes, that's risky, but I'm pretty sure I could do it safely.  Maybe after the burn this year we'll be able to play with the valves and experiment to see if forcing the valve to open and close faster than it can with only 12 volts actually allows any interesting fire effects?
+
+<img src="http://www.dorkbotpdx.org/files/images/pirateshipfire_sch.png">
+
+A couple extra overly cautious things I did do were resistors to slow down the gate drive into the microseconds range (still far faster than any mechanical valve can move), and just to be extra cautious, I put a tiny R-C snubber on the output, just in case the transistor somehow switches faster that the reverse recovery time of those diodes.  I guess over an amp of current flowing in an almost purely inductive load makes me a bit nervous.  Those parts probably aren't necessary and the 2 diodes are probably all the protection necessary from inductive spikes... but I wanted to play it extra safe since things are so hard to fix out on the playa at Burning Man (especially at night, when the fire will be in use).
+
+So with all this circuitry hooked up, the good news is it's all programmable with Arduino.  Here's the sketch I delivered to Andy.  It reads a 12 position rotary knob and a speed pot, and plays 1 of the 12 sequences when a "Go" button is pressed.  There's a "stop" and "fire all" button, and the 4th button is unused.
+
+While this code is fairly long, and a bit complex in the custom delay and other stuff near the end, I tried to keep the definition of the 12 sequences very simple.  Just digitalWrite and the custom delay function.
+
+<pre style="padding-left: 4em">
+#include&nbsp;&lt;<span style="color: #CC6600;">LiquidCrystal</span>.h&gt;
+#include&nbsp;&lt;<span style="color: #CC6600;">Bounce</span>.h&gt;
+
+<span style="color: #7E7E7E;">//&nbsp;input&nbsp;pins</span>
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> go_button_pin      = 4;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> stop_button_pin    = 1;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> all_button_pin     = 2;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> speed_knob_pin     = 20;  <span style="color: #7E7E7E;">// analog</span>
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> rotary_select_pin  = 21; <span style="color: #7E7E7E;">// analog</span>
+
+<span style="color: #7E7E7E;">//&nbsp;output&nbsp;pins</span>
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve1_pin         = 19;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve2_pin         = 18;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve3_pin         = 17;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve4_pin         = 16;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve5_pin         = 15;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve6_pin         = 14;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve7_pin         = 13;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> valve8_pin         = 12;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> lcd_rs_pin         = 5;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> lcd_en_pin         = 6;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> lcd_d4_pin         = 7;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> lcd_d5_pin         = 8;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> lcd_d6_pin         = 9;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> lcd_d7_pin         = 10;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> led_pin            = 11;
+
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">byte</span> valvelist[8] = {valve1_pin, valve2_pin, valve3_pin, valve4_pin,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;valve5_pin,&nbsp;valve6_pin,&nbsp;valve7_pin,&nbsp;valve8_pin};
+
+<span style="color: #7E7E7E;">//&nbsp;unused&nbsp;pins</span>
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> unused_button_pin  = 3;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> unused1_pin        = 0;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> unused2_pin        = 22;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> unused3_pin        = 23;
+<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">int</span> unused4_pin        = 24;
+
+<span style="color: #7E7E7E;">//&nbsp;Objects&nbsp;for&nbsp;the&nbsp;buttons&nbsp;and&nbsp;display</span>
+<span style="color: #CC6600;">Bounce</span> go_button(go_button_pin, 10);
+<span style="color: #CC6600;">Bounce</span> stop_button(stop_button_pin, 10);
+<span style="color: #CC6600;">Bounce</span> all_button(all_button_pin, 10);
+<span style="color: #CC6600;">LiquidCrystal</span> lcd(lcd_rs_pin, lcd_en_pin,
+&nbsp;&nbsp;lcd_d4_pin,&nbsp;lcd_d5_pin,&nbsp;lcd_d6_pin,&nbsp;lcd_d7_pin);
+
+
+
+
+#define&nbsp;Pattern_Name_1&nbsp;<span style="color: #006699;">"Sweep Left+Right"</span>;
+<span style="color: #CC6600;">void</span> play1()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+}
+
+
+#define&nbsp;Pattern_Name_2&nbsp;<span style="color: #006699;">"Sweep Right-Left"</span>
+<span style="color: #CC6600;">void</span> play2()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(150, 100)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+}
+
+#define&nbsp;Pattern_Name_3&nbsp;<span style="color: #006699;">"Alt Side-Side"</span>
+<span style="color: #CC6600;">void</span> play3()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> count=0; count &lt; 6; count++) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(90, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(90, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;}
+}
+
+#define&nbsp;Pattern_Name_4&nbsp;<span style="color: #006699;">"Alt Odd-Even"</span>
+<span style="color: #CC6600;">void</span> play4()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> count=0; count &lt; 6; count++) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(90, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(90, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;}
+}
+
+#define&nbsp;Pattern_Name_5&nbsp;<span style="color: #006699;">"Mid to Outside"</span>;
+<span style="color: #CC6600;">void</span> play5()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(80, 25)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(80, 25)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(80, 25)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(80, 25)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(80, 25)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(80, 25)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(80, 25)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+}
+
+#define&nbsp;Pattern_Name_6&nbsp;<span style="color: #006699;">"(unused) Six"</span>
+<span style="color: #CC6600;">void</span> play6()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(25, 50)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+}
+
+#define&nbsp;Pattern_Name_7&nbsp;<span style="color: #006699;">"Random, 1 valve"</span>
+<span style="color: #CC6600;">void</span> play7()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">byte</span> i=0; i&lt;20; i++) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">byte</span> myValve = valvelist[<span style="color: #CC6600;">random</span>(0, 8)];
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;}
+}
+
+<span style="color: #7E7E7E;">//&nbsp;this&nbsp;is&nbsp;a&nbsp;comment&nbsp;</span>
+<span style="color: #7E7E7E;">//&nbsp;You&nbsp;can&nbsp;type&nbsp;a&nbsp;description</span>
+<span style="color: #7E7E7E;">//&nbsp;Or&nbsp;deep&nbsp;thoughts</span>
+#define&nbsp;Pattern_Name_8&nbsp;<span style="color: #006699;">"Random, 2 valves"</span>
+<span style="color: #CC6600;">void</span> play8()
+{
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">byte</span> i=0; i&lt;20; i++) {
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">byte</span> myValve1 = valvelist[<span style="color: #CC6600;">random</span>(0, 8)];
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">byte</span> myValve2 = myValve1;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">while</span> (myValve2 == myValve1) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myValve2&nbsp;=&nbsp;valvelist[<span style="color: #CC6600;">random</span>(0, 8)];
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve1, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve2, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve1, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve2, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;}&nbsp;
+}
+
+#define&nbsp;Pattern_Name_9&nbsp;<span style="color: #006699;">"Random, 2 Valves"</span>;
+<span style="color: #CC6600;">void</span> play9()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">byte</span> prev1 = 100;
+&nbsp;&nbsp;<span style="color: #CC6600;">byte</span> prev2 = 101;
+&nbsp;&nbsp;<span style="color: #CC6600;">byte</span> myValve1 = 102;
+&nbsp;&nbsp;<span style="color: #CC6600;">byte</span> myValve2 = 103;
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">byte</span> i=0; i&lt;20; i++) { 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">while</span> (myValve1 == prev1 || myValve1 == prev2 || myValve2 == prev1 || myValve2 == prev2) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myValve1&nbsp;=&nbsp;valvelist[<span style="color: #CC6600;">random</span>(0, 8)];
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myValve2&nbsp;=&nbsp;myValve1;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">while</span> (myValve2 == myValve1) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myValve2&nbsp;=&nbsp;valvelist[<span style="color: #CC6600;">random</span>(0, 8)];
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve1, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve2, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve1, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(myValve2, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;prev1&nbsp;=&nbsp;myValve1;
+&nbsp;&nbsp;&nbsp;&nbsp;prev2&nbsp;=&nbsp;myValve2;
+&nbsp;&nbsp;}&nbsp;
+}
+
+#define&nbsp;Pattern_Name_10&nbsp;<span style="color: #006699;">"Pi Pattern"</span>
+<span style="color: #CC6600;">void</span> play10()
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (delayCust(50, 75)) <span style="color: #CC6600;">return</span>;
+&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;
+}
+
+#define&nbsp;Pattern_Name_11&nbsp;<span style="color: #006699;">"(unused) Eleven"</span>
+<span style="color: #CC6600;">void</span> play11()
+{
+&nbsp;&nbsp;
+}
+
+#define&nbsp;Pattern_Name_12&nbsp;<span style="color: #006699;">"(unused) Twelve"</span>
+<span style="color: #CC6600;">void</span> play12()
+{
+&nbsp;&nbsp;
+}
+
+
+
+<span style="color: #7E7E7E;">//&nbsp;initialize&nbsp;hardware&nbsp;-&nbsp;only&nbsp;done&nbsp;once&nbsp;at&nbsp;bootup</span>
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>setup</b></span>() {
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(go_button_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(stop_button_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(all_button_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(unused_button_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(unused1_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(unused2_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(unused3_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(unused4_pin, <span style="color: #006699;">INPUT_PULLUP</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve1_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve2_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve3_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve4_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve5_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve6_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve7_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(valve8_pin, <span style="color: #006699;">OUTPUT</span>);
+&nbsp;&nbsp;lcd.<span style="color: #CC6600;">begin</span>(16, 2);
+}
+
+<span style="color: #CC6600;">int</span> prev_num = -100;
+<span style="color: #CC6600;">int</span> prev_knob_reading = -100;
+
+
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>loop</b></span>() {
+&nbsp;&nbsp;<span style="color: #7E7E7E;">// first, update the status of the buttons</span>
+&nbsp;&nbsp;go_button.<span style="color: #CC6600;">update</span>();
+&nbsp;&nbsp;stop_button.<span style="color: #CC6600;">update</span>();
+&nbsp;&nbsp;all_button.<span style="color: #CC6600;">update</span>();
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #7E7E7E;">// the "ALL" button is highest priority</span>
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (all_button.<span style="color: #CC6600;">read</span>() == <span style="color: #006699;">LOW</span>) {
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">clear</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">" All Valves ON"</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">HIGH</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">while</span> (all_button.<span style="color: #CC6600;">read</span>() == <span style="color: #006699;">LOW</span>) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;all_button.<span style="color: #CC6600;">update</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">// do nothing, just wait for button release</span>
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">clear</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;prev_num&nbsp;=&nbsp;-100;
+&nbsp;&nbsp;&nbsp;&nbsp;prev_knob_reading&nbsp;=&nbsp;-100;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #7E7E7E;">// when not doing anything, read the knobs</span>
+&nbsp;&nbsp;<span style="color: #7E7E7E;">// and show status info on the LCD</span>
+&nbsp;&nbsp;<span style="color: #CC6600;">int</span> rotary_reading = <span style="color: #CC6600;">analogRead</span>(rotary_select_pin);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">int</span> num;
+&nbsp;&nbsp;<span style="color: #CC6600;">const</span> <span style="color: #CC6600;">char</span> *name;
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (rotary_reading &lt; 47) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;1;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_1;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 140) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;2;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_2;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 233) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;3;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_3;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 326) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;4;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_4;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 419) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;5;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_5;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 512) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;6;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_6;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 605) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;7;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_7;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 698) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;8;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_8;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 791) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;9;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_9;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 884) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;10;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_10;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> <span style="color: #CC6600;">if</span> (rotary_reading &lt; 977) {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;11;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_11;
+&nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> {
+&nbsp;&nbsp;&nbsp;&nbsp;num&nbsp;=&nbsp;12;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;=&nbsp;Pattern_Name_12;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (num != prev_num) {
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">setCursor</span>(0, 0);
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(name); 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> i=strlen(name); i &lt; 16; i++) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">' '</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;prev_num&nbsp;=&nbsp;num;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;
+&nbsp;&nbsp;get_speed();
+&nbsp;&nbsp;lcd.<span style="color: #CC6600;">setCursor</span>(9, 1);
+&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">"Ready"</span>);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (go_button.<span style="color: #CC6600;">fallingEdge</span>()) {
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">setCursor</span>(9, 1);
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">"Running"</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span> (num) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: play1(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: play2(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: play3(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: play4(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: play5(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: play6(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: play7(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 8: play8(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 9: play9(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 10: play10(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 11: play11(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 12: play12(); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">default</span>: play1();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">// after playing, always make sure all valves are off</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve1_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve2_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve3_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve4_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve5_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve6_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve7_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(valve8_pin, <span style="color: #006699;">LOW</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">// and reset the state, so the screen fully redraws</span>
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">clear</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;prev_num&nbsp;=&nbsp;-100;
+&nbsp;&nbsp;&nbsp;&nbsp;prev_knob_reading&nbsp;=&nbsp;-100;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">delay</span>(10); 
+}
+
+
+<span style="color: #7E7E7E;">//&nbsp;Read&nbsp;the&nbsp;speed&nbsp;knob.&nbsp;&nbsp;This&nbsp;is&nbsp;a&nbsp;bit&nbsp;tricky,&nbsp;because&nbsp;we&nbsp;don't&nbsp;want&nbsp;to</span>
+<span style="color: #7E7E7E;">//&nbsp;rapidly&nbsp;alternate&nbsp;between&nbsp;two&nbsp;speed&nbsp;settings&nbsp;if&nbsp;the&nbsp;knob&nbsp;is&nbsp;exactly&nbsp;at</span>
+<span style="color: #7E7E7E;">//&nbsp;the&nbsp;mid-point&nbsp;and&nbsp;a&nbsp;tiny&nbsp;bit&nbsp;of&nbsp;noise&nbsp;changes&nbsp;the&nbsp;reading&nbsp;slightly.</span>
+<span style="color: #7E7E7E;">//&nbsp;So&nbsp;instead,&nbsp;this&nbsp;code&nbsp;remember&nbsp;the&nbsp;previous&nbsp;setting&nbsp;and&nbsp;implements&nbsp;a</span>
+<span style="color: #7E7E7E;">//&nbsp;tiny&nbsp;dead&nbsp;band&nbsp;(hysteresis)&nbsp;to&nbsp;so&nbsp;the&nbsp;user&nbsp;always&nbsp;sees&nbsp;a&nbsp;smooth</span>
+<span style="color: #7E7E7E;">//&nbsp;appearance&nbsp;on&nbsp;the&nbsp;LCD.</span>
+<span style="color: #7E7E7E;">//</span>
+<span style="color: #CC6600;">byte</span> get_speed(<span style="color: #CC6600;">void</span>)
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">byte</span> knob_speed = 1;
+&nbsp;&nbsp;<span style="color: #CC6600;">int</span> knob_reading = <span style="color: #CC6600;">analogRead</span>(speed_knob_pin);
+&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (knob_reading &lt; prev_knob_reading - 2 || knob_reading &gt; prev_knob_reading + 2) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">setCursor</span>(0, 1);   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">"Speed:"</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;knob_speed&nbsp;=&nbsp;(knob_reading&nbsp;/&nbsp;94)&nbsp;+&nbsp;1;&nbsp;&nbsp;<span style="color: #7E7E7E;">// range is 1 to 11</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>((<span style="color: #CC6600;">int</span>)knob_speed);  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (knob_speed &lt; 10) lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">" "</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;prev_knob_reading&nbsp;=&nbsp;knob_reading;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color: #CC6600;">return</span> knob_speed;
+}
+
+
+<span style="color: #7E7E7E;">//&nbsp;Delay&nbsp;based&nbsp;on&nbsp;speed&nbsp;setting.&nbsp;&nbsp;"mult"&nbsp;is&nbsp;a&nbsp;multiplier&nbsp;for</span>
+<span style="color: #7E7E7E;">//&nbsp;the&nbsp;speed,&nbsp;and&nbsp;"fixed"&nbsp;is&nbsp;a&nbsp;fixed&nbsp;delay&nbsp;that&nbsp;is&nbsp;always</span>
+<span style="color: #7E7E7E;">//&nbsp;added&nbsp;regardless&nbsp;of&nbsp;the&nbsp;speed&nbsp;setting.&nbsp;&nbsp;This&nbsp;fancy&nbsp;code</span>
+<span style="color: #7E7E7E;">//&nbsp;allows&nbsp;the&nbsp;delay&nbsp;setting&nbsp;to&nbsp;change,&nbsp;and&nbsp;also&nbsp;aborts&nbsp;if&nbsp;the</span>
+<span style="color: #7E7E7E;">//&nbsp;STOP&nbsp;or&nbsp;ALL&nbsp;buttons&nbsp;are&nbsp;pressed.</span>
+<span style="color: #7E7E7E;">//</span>
+<span style="color: #CC6600;">boolean</span> delayCust(<span style="color: #CC6600;">int</span> mult, <span style="color: #CC6600;">int</span> fixed)
+{
+&nbsp;&nbsp;<span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">long</span> us = <span style="color: #CC6600;">micros</span>();
+&nbsp;&nbsp;<span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">long</span> elapsed_ms = 0;
+&nbsp;&nbsp;<span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">long</span> target_ms;
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color: #CC6600;">while</span> (1) {
+&nbsp;&nbsp;&nbsp;&nbsp;target_ms&nbsp;=&nbsp;(11&nbsp;-&nbsp;get_speed())&nbsp;*&nbsp;mult&nbsp;+&nbsp;fixed;&nbsp;<span style="color: #7E7E7E;">// moving target</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (elapsed_ms &gt;= target_ms) <span style="color: #CC6600;">return</span> <span style="color: #CC6600;">false</span>;  <span style="color: #7E7E7E;">// delay completed</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (<span style="color: #CC6600;">micros</span>() - us &gt;= 1000) {
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elapsed_ms&nbsp;=&nbsp;elapsed_ms&nbsp;+&nbsp;1;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;us&nbsp;=&nbsp;us&nbsp;+&nbsp;1000;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (stop_button.<span style="color: #CC6600;">update</span>()) <span style="color: #CC6600;">return</span> <span style="color: #CC6600;">true</span>; <span style="color: #7E7E7E;">// delay interrupted</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (all_button.<span style="color: #CC6600;">update</span>()) <span style="color: #CC6600;">return</span> <span style="color: #CC6600;">true</span>;
+&nbsp;&nbsp;}
+}
+</pre>
+
+The last bit of technical info to share is the PCB gerber files, which were sent to Sunstone.  The files are attached below.
+
+<img src="http://www.dorkbotpdx.org/files/images/valvesw_pcb.png">
+
+If you use these files, please be aware 1 small error was discovered.  The power for the LCD was mistakenly connected to +12 volts.  If you use a LCD, you must cut that trace and solder a wire to the +5 volt output of the LM7805.  Other that that 1 error, the board works great.
+
+Hopefully after the burn this year, Andy will have lots of picture and video on <a href="http://www.lostmachine.com/blog/">his blog</a> of the pirate ship and its fire effects in action!

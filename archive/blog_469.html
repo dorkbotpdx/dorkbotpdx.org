@@ -1,0 +1,13 @@
+Temperature Controller Boxed Up
+2010-02-23 10:20:20
+scott_d
+
+I finished building a project box and adding inputs to allow the closed loop temperature controller (http://www.instructables.com/id/Closing-the-Loop-on-Surface-Mount-Soldering/) to stand alone (without needing to be connected to a computer to control it).
+<!--break-->
+The front panel has terminal blocks for the thermocouple input and the control line for the SSR and a DB9 connector for the IR temperature sensor.
+
+I used an encoder with a switch to allow the user to set the temperature.  Originally I had planned to write the code to automatically ramp the temperature for the right solder paste reflow profile but so far I've found it pretty simple to just use the encoder to set the temperature to each of the points on the curve.  I have the code reset the running timer on the LCD each time the temperature target is reset and this helps a lot to keep track of when the next temperature change is due.  One other little trick on setting the temperature target is that the PID software that we are using (http://www.arduino.cc/playground/Main/BarebonesPIDForEspresso) keeps the initial target temperature in EEPROM.  When I reset the target temperature with the encoder, my code doesn't change the initial temperature in the EEPROM.  That way, when the system starts up, it goes to a known temperature from the EEPROM (currently a nice safe 90&deg;C) and not some arbitrary temperature left over from the last run.
+
+The thermocouple interface uses a MAX6675 chip and a simple circuit from the Maxim datasheet to give an SPI digital input of the thermocouple temperature.  A nice Arduino library is available for the MAX6675 (http://code.google.com/p/max6675-arduino-library).
+
+The LCD is currently programmed to display a timer, the target temperature and the temperature readings from the IR and thermocouple sensors.  I'll probably change the code a bit to make a nicer looking display on the LCD and add some menus to change which temperature sensor is used by the PID controller and perhaps some other parameters.  Maybe I'll add the automatic temperature ramping as well.

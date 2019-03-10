@@ -1,0 +1,105 @@
+Inexpensive IR Based Temperature Sensor for Microprocessors
+2010-02-10 23:58:49
+scott_d
+
+After taking Jim Larson's <a href="http://dorkbotpdx.org/blog/laen/surface_mount_soldering_workshop_saturday_december_19th_at_techshop">workshop</a> on surface mount soldering, I wanted to set up my own hot plate system for reflow soldering.  But rather than use an open loop temperature control system like Jim was using at the time, I thought I'd take a crack at a closed loop control system.  The first problem was that I didn't have a convenient temperature sensor which would go up to over 200&deg;C as would be needed to reflow lead free solder paste.
+
+A thermocouple would do the trick but I didn't have one and all the other temperature sensors that I had handy (like a TMP36) topped out at about 100&deg;C.  However, I did have an <a href="http://www.harborfreightusa.com/usa/itemdisplay/displayItem.do?itemid=93984">IR thermometer</a> which I purchased from Harbor Freight Tools ($25 but often on sale for less) which has a range of up to 250&deg;C.  So I decided to break it open and see if I could find a way to get the temperature out to a micro.  It turns out that the IR module inside this unit has a clocked serial output conveniently available on a header.  And there is enough information on the web (http://www.zytemp.com/download/TNm_302.pdf) to create an Arduino sketch to read out the temperature from the serial data.  Here is a simple code example for how to do it which I have running on my <a href="http://dorkbotpdx.org/blog/scott_d/my_first_pcb_project">LCD/Dorkboard</a>:
+<code>
+#include &lt;LiquidCrystal.h&gt;
+#define D4 7
+#define D5 8
+#define D6 9
+#define D7 10
+#define RW 11
+#define E 6
+#define RS 12
+#define BL 5 // backlight control on pin 5 (pwm 0=bright, 511=off)
+#define CNTRL 13
+LiquidCrystal lcd(RS, RW, E, D4, D5, D6, D7);
+int blevel = 0;
+
+#define CLK 3
+#define DATA 4
+
+volatile int nbits = 0;
+volatile  byte hexbyte = 0;
+volatile  byte read_byte;
+volatile int byte_ready = 0;
+
+volatile unsigned char message[4];
+volatile int nbytes = 0;
+volatile int message_waiting = 0;
+
+unsigned long last_time = 0;
+
+float temp;
+float ambient;
+
+void setup() {
+  delay(2000);
+  lcd.begin(2,16);
+  lcd.clear();
+  pinMode(BL, OUTPUT);
+  analogWrite(BL,blevel);
+
+  pinMode(CLK, INPUT);
+  pinMode(DATA, INPUT);
+  attachInterrupt(1, readBit, FALLING);
+}
+
+void readBit() {
+  int val = digitalRead(DATA);
+  nbits++;
+  int bit = (val == HIGH) ? 1 : 0;
+  hexbyte = (hexbyte << 1) | bit;
+  if (nbits == 8) {
+    if (byte_ready == 0) {
+      read_byte = hexbyte;
+      byte_ready = 1;
+    }
+    if (hexbyte == 0xd) {
+      nbytes = 0;
+      message_waiting = 1;
+    } else if (message_waiting == 0) {
+      if (nbytes < 4) {
+        message[nbytes] = hexbyte;
+      }
+      nbytes++;
+    }
+    hexbyte = 0;
+    nbits = 0;
+  }
+}
+
+void loop() {
+  if (message_waiting == 1) {
+      last_time = millis();
+      if (message[0] == 0x4c) {
+      int t = message[1]<<8 | message[2];
+      temp = t/16.0 -273.15;
+      lcd.clear();
+      lcd.print(millis()/1000.0);lcd.print(" ");
+      lcd.print(temp);
+    } else if (message[0] == 0x66) {
+      int t = message[1]<<8 | message[2];
+      ambient = t/16.0 -273.15;
+    }
+    message_waiting = 0;
+  }
+  if (millis() - last_time > 1000) {
+    nbits = 0;
+    nbytes = 0;
+    hexbyte = 0;
+    message_waiting = 0;
+    byte_ready = 0;
+    last_time = millis();
+  }
+}
+
+
+</code>
+
+I combined that with an Arduino sketch which does PID control (<a href = "http://www.arduino.cc/playground/Main/BarebonesPIDForEspresso">BBCC</a>, which was originally written to control the temperature of an espresso machine) and used an SSR I bought off of bay to control the hotplate AC.  The result is a system which does a good job of holding the temperature since the IR sensor reacts very quickly to temperature changes.  
+
+Jim has now extended his original hot plate based surface mount reflow soldering system to include a version of this closed loop system and he has done a very nice <a href="http://www.instructables.com/id/Closing-the-Loop-on-Surface-Mount-Soldering/">Instructable</a> which shows how it is done, including pictures of how to modify the Harbor Freight IR unit.  So you should check that out for the details.  I'm posting this entry separately for people who could use a nice temperature sensing hack but might not look in an Instructable on surface mount soldering.

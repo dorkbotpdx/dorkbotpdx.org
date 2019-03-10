@@ -1,0 +1,96 @@
+Teensy as Benito, at 57600 baud
+2010-05-30 11:10:13
+paul
+
+At the last Monday meetup, Scott mentioned my Teensy-as-Benito code wasn't working with the '328-based Arduino and Dorkboards, which now run at 57600 baud.  So this weekend I dusted off my Dorkboard to investigate.
+
+<img src="http://www.pjrc.com/teensy/teensy_benito2.jpg">
+
+Read on for details, and updated code with a workaround....
+
+The UART (serial port) in these AVR chips generates its baud rate from the main clock, which is usually a very accurate crystal or pretty accurate ceramic resonator.  However, it can only divide that clock by integer multiples of 8 or 16.  With a 16 MHz clock, you can get close, but not exactly the correct baud rates.  Some small error is ok.  Usually about 2% to 2.5% is the maximum error before reliability problems occur.
+
+The Arduino bootloader is actually using 58824 baud, which is 16e6 / (17 * 16).  That's +2.124% error.
+
+The UART code in Teensyduino, when 57600 baud is requested, uses 57143, which is 16e6 / (35 * 8).  That's -0.794% error.
+
+Either can communicate with a FTDI chip or PC, which generates a very accurate 57600 baud rate, but when used together, the total error is too much because Arduino's is 2.1% too fast and Teensy's is 0.8% too slow.
+
+As a workaround, I just added a check for when the PC requests 57600 baud, and instead the baud rate is set to 58824, to exactly match the Arduino bootloader's actual baud rate.
+
+You can <a href="http://www.pjrc.com/teensy/Teensy_Benito.zip">download the updated code</a>.  I also added code to blink the LED, and I included pre-compiled copies for Teensy 2.0, Teensy 1.0, and Don's Benito, so you can just load the appropriate code onto your board using the Teensy Loader or DFU programmer.  Of course, you can customize it as easily as tweaking any Arduino-based project, because it's built with Teensyduino!
+
+Here is the source code:
+
+<pre>
+<span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">long</span> baud = 19200;
+HardwareSerial&nbsp;<span style="color: #CC6600;">Uart</span> = HardwareSerial();
+const&nbsp;<span style="color: #CC6600;">int</span> reset_pin = 4;
+const&nbsp;<span style="color: #CC6600;">int</span> led_pin = 11;  <span style="color: #7E7E7E;">// 11=Teensy 2.0, 6=Teensy 1.0, 16=Benito</span>
+const&nbsp;<span style="color: #CC6600;">int</span> led_on = <span style="color: #006699;">HIGH</span>;
+const&nbsp;<span style="color: #CC6600;">int</span> led_off = <span style="color: #006699;">LOW</span>;
+
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>setup</b></span>()
+{
+	<span style="color: #CC6600;">pinMode</span>(led_pin, <span style="color: #006699;">OUTPUT</span>);
+	<span style="color: #CC6600;">digitalWrite</span>(led_pin, led_off);
+	<span style="color: #CC6600;">digitalWrite</span>(reset_pin, <span style="color: #006699;">HIGH</span>);
+	<span style="color: #CC6600;">pinMode</span>(reset_pin, <span style="color: #006699;">OUTPUT</span>);
+	<span style="color: #CC6600;"><b>Serial</b></span>.<span style="color: #CC6600;">begin</span>(baud);	<span style="color: #7E7E7E;">// USB, communication to PC or Mac</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">Uart</span>.<span style="color: #CC6600;">begin</span>(baud);	<span style="color: #7E7E7E;">// UART, communication to Dorkboard</span>
+}
+
+<span style="color: #CC6600;">long</span> led_on_time=0;
+
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>loop</b></span>()
+{
+	<span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">char</span> c, dtr;
+	<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">char</span> prev_dtr = 0;
+
+	<span style="color: #CC6600;">if</span> (<span style="color: #CC6600;"><b>Serial</b></span>.<span style="color: #CC6600;">available</span>()) {
+		c&nbsp;=&nbsp;<span style="color: #CC6600;"><b>Serial</b></span>.<span style="color: #CC6600;">read</span>();
+		<span style="color: #CC6600;">Uart</span>.<span style="color: #CC6600;">write</span>(c);
+		<span style="color: #CC6600;">digitalWrite</span>(led_pin, led_on);
+		led_on_time&nbsp;=&nbsp;<span style="color: #CC6600;">millis</span>();
+		<span style="color: #CC6600;">return</span>;
+	}
+	<span style="color: #CC6600;">if</span> (<span style="color: #CC6600;">Uart</span>.<span style="color: #CC6600;">available</span>()) {
+		c&nbsp;=&nbsp;<span style="color: #CC6600;">Uart</span>.<span style="color: #CC6600;">read</span>();
+		<span style="color: #CC6600;"><b>Serial</b></span>.<span style="color: #CC6600;">write</span>(c);
+		<span style="color: #CC6600;">digitalWrite</span>(led_pin, led_on);
+		led_on_time&nbsp;=&nbsp;<span style="color: #CC6600;">millis</span>();
+		<span style="color: #CC6600;">return</span>;
+	}
+	dtr&nbsp;=&nbsp;<span style="color: #CC6600;"><b>Serial</b></span>.dtr();
+	<span style="color: #CC6600;">if</span> (dtr &amp;&amp; !prev_dtr) {
+		<span style="color: #CC6600;">digitalWrite</span>(reset_pin, <span style="color: #006699;">LOW</span>);
+		<span style="color: #CC6600;">delayMicroseconds</span>(250);
+		<span style="color: #CC6600;">digitalWrite</span>(reset_pin, <span style="color: #006699;">HIGH</span>);
+	}
+	prev_dtr&nbsp;=&nbsp;dtr;
+	<span style="color: #CC6600;">if</span> (<span style="color: #CC6600;">millis</span>() - led_on_time &gt; 3) {
+		<span style="color: #CC6600;">digitalWrite</span>(led_pin, led_off);
+	}
+	<span style="color: #CC6600;">if</span> (<span style="color: #CC6600;"><b>Serial</b></span>.baud() != baud) {
+		baud&nbsp;=&nbsp;<span style="color: #CC6600;"><b>Serial</b></span>.baud();
+		<span style="color: #CC6600;">if</span> (baud == 57600) {
+			<span style="color: #7E7E7E;">// This ugly hack is necessary for talking</span>
+			<span style="color: #7E7E7E;">// to the arduino bootloader, which actually</span>
+			<span style="color: #7E7E7E;">// communicates at 58824 baud (+2.1% error).</span>
+			<span style="color: #7E7E7E;">// Teensyduino will configure the UART for</span>
+			<span style="color: #7E7E7E;">// the closest baud rate, which is 57143</span>
+			<span style="color: #7E7E7E;">// baud (-0.8% error).  Serial communication</span>
+			<span style="color: #7E7E7E;">// can tolerate about 2.5% error, so the</span>
+			<span style="color: #7E7E7E;">// combined error is too large.  Simply</span>
+			<span style="color: #7E7E7E;">// setting the baud rate to the same as</span>
+			<span style="color: #7E7E7E;">// arduino's actual baud rate works.</span>
+			<span style="color: #CC6600;">Uart</span>.<span style="color: #CC6600;">begin</span>(58824);
+		}&nbsp;<span style="color: #CC6600;">else</span> {
+			<span style="color: #CC6600;">Uart</span>.<span style="color: #CC6600;">begin</span>(baud);
+		}
+	}
+}
+</pre>
+
+
+

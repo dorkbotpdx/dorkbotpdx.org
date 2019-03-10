@@ -1,0 +1,41 @@
+AVR Power Saving Modes
+2008-10-30 14:12:04
+Laen
+
+AVR chips have a couple of built-in ways to reduce power usage: "sleep" modes, and "Power Reduction Modes".   Sleep modes stop the running program (which is the biggest power hog), waiting for an interrupt to wake it up, while Power Reduction Modes can be used any time (including while the processor is asleep).
+
+<!--break-->
+
+<a href="http://www.nongnu.org/avr-libc/user-manual/group__avr__sleep.html">Sleep Mode: </a>
+The sleep modes available to you depends on which type of chip you're on.   An ATmega168 may have all of them, while an ATTiny45 only has a couple.
+
+SLEEP_MODE_IDLE
+SLEEP_MODE_ADC
+SLEEP_MODE_PWR_DOWN
+SLEEP_MODE_PWR_SAVE
+SLEEP_MODE_STANDBY
+SLEEP_MODE_EXT_STANDBY
+
+While the processor is asleep, the main program won't be running.  The only way to wake it up is via an interrupt, and sometimes only an external INT0 interrupt (depending on the sleep mode).
+
+To set the sleep desired sleep mode, put this in your code:
+   set_sleep_mode(SLEEP_MODE_IDLE);
+
+and to actually put it to sleep:
+   sleep_mode();
+
+Make sure you have an interrupt enabled, or the processor will never wake up.
+
+<a href="http://www.nongnu.org/avr-libc/user-manual/group__avr__power.html">Power Reduction Mode:</a>
+In addition to putting the whole thing to sleep, you can also turn off parts of the chip that you aren't using by using the chip's Power Reduction Manager.  
+
+Like, if you're not using the ADC, shut it off:
+  power_adc_disable();
+
+Or if your project doesn't need to do any serial communication:
+  power_usi_disable();
+
+For maximum power reduction, just run this:
+ power_all_disable()
+
+then enable what you want you actually need.

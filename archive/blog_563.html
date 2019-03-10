@@ -1,0 +1,37 @@
+Txtzyme Remote Signals
+2010-06-21 06:33:56
+WardCunningham
+
+<p>The Txtzyme <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/remote_control_with_txtzyme">Remote Server</a> offers a Web 2.0 style interface through simple scripts written in Ruby and JavaScript. I've tested this by adding smart phone friendly signal processing. It looks like this:</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Screen%20shot%202010-06-21%20at%205.58.11%20AM.png'/></p>
+<p>Once you have selected a channel, you can refresh the waveform by tapping the display. (I've experimented with higher bandwidth communication but find it to be sporadic on the phone.)</p>
+<p>This is what the Ruby (Sinatra) request handler looks like:</p>
+<dl>
+<dd>get&#160;%r{/ch/([0-9])} do |ch|
+<dl>
+<dd>vect "101{#{ch}sp50u}", (0..100).map{|i|i*50}</dd>
+</dl>
+</dd>
+<dd>end</dd>
+</dl>
+<p>This says, when someone asks for /ch/5, give them back 101 xy pairs sampled from channel 5 in a JSON document. This is ready made for jQuery/FLOT display with this Javascript:</p>
+<dl>
+<dd>$('[name=channel]').click(function(obj){
+<dl>
+<dd>var ch = obj.currentTarget.value;</dd>
+<dd>$.getJSON('ch/'+ch, function (data) {
+<dl>
+<dd>$.plot($(".plot"), [data], {});</dd>
+</dl>
+</dd>
+<dd>});</dd>
+</dl>
+</dd>
+<dd>});</dd>
+</dl>
+<p>The punctuation here is a little hard to defend except to say that it is idiomatic jQuery. The third line is where the client hits the server to get samples from channel ch. And remember, this works on the phone.</p>
+<p>The signal above is my favorite source, the 60Hz hum floating around my house. Here is what it looks like in the frequency domain:</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Screen%20shot%202010-06-21%20at%205.58.31%20AM.png'/></p>
+<p>The two large low peaks are 60Hz and 120Hz respectively. (I don't have the horizontal axis right here yet.)</p>
+<p>This web server approach adds some installation complexity that can be avoided by working on the desktop. I've explored that option with a system I've called <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/txtzyme_javascope_feeds_javas_2d_graphics">Javascope</a>.</p>
+

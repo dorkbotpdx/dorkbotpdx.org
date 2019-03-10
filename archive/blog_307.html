@@ -1,0 +1,5 @@
+Dorkboard working with Ubuntu 8.04
+2009-01-26 22:40:50
+PhilipOfOregon
+
+<p>I needed to do a little extra work to get the Dorkboard working through Ubuntu 8.04.</p><p>I added a udev rule as described in <a class="external text" href="http://www.dorkbotpdx.org/wiki/benito" rel="nofollow">a benito comment</a>.</p><p>I also added a symbolic link: "ln -s ttyACM0 ttyUSB0" as suggested in <a class="external text" href="http://dorkbotpdx.org/blog/feurig/arduino_cult_induction_rev3_followup%7C" rel="nofollow">a cult induction followup for rev3</a>.</p><p>The symbolic link is necessary to get the Arduino IDE to find the USB serial port.</p>

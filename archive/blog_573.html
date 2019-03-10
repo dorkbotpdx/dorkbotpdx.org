@@ -1,0 +1,19 @@
+Atmospheric Tides Wiggle My Barometer
+2010-07-27 20:14:09
+WardCunningham
+
+<p>My friend Karl gave me an <a rel="nofollow" class="external text" href="http://www.freescale.com/webapp/sps/site/prod_summary.jsp?code=MPX4250">mpx4250</a> absolute pressure sensor that never got built into his DIY automotive super-charger. I hooked it up to <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/sensorserver_aproaching_1_0">SensorServer</a> and started recording data that looks like this:</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Screen%20shot%202010-07-27%20at%206.53.05%20PM.png'/></p>
+<p>The sensor's four-atmosphere dynamic range leaves weather fluctuations mostly in the noise. But that doesn't mean some interesting things haven't shown up. For example, the above chart shows a diurnal variation that I now know is caused by <a class="external text" href="http://en.wikipedia.org/wiki/Atmospheric_tide">Atmospheric Tides</a>.</p>
+<p>I'm pleased to be logging this data with Txtzyme which I have integrated into my SensorServer network. I've described my Sinatra based <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/remote_control_with_txtzyme">Txtzyme Remote</a> project in a previous post. I added this code to that server:</p>
+<dl>
+<dd>get '/ss' do
+<dl>
+<dd>{&#160;:mpx4250 =&gt; avg("100{6sp150u}") }.to_json</dd>
+</dl>
+</dd>
+<dd>end</dd>
+</dl>
+<p>This says, take 100 samples from channel 6 sampling every 150 microseconds or so. Average these and report the answer in a SensorServer-ready JSON key-value pair. (See <a rel="nofollow" class="external text" href="http://github.com/WardCunningham/Txtzyme/blob/master/projects/remote/server.rb">code</a>, <a rel="nofollow" class="external text" href="http://c2.com/ward/arduino/SensorServer/recent.cgi?code=mpx4250&amp;hours=96&amp;smooth=0.9">graph</a>)</p>
+<p>Unlike ocean tides, atmospheric tides are caused by solar heating stirring the sparse air at 100 km altitude. I see this as pressure that falls all day and recovers each night. Both Newton and Leibnitz reported similar observations over 100 years ago.</p>
+

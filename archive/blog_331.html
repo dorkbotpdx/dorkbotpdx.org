@@ -1,0 +1,196 @@
+PCB Panellizing in the GIMP
+2009-04-03 11:56:45
+ax
+
+<p>
+	While I'm not happy using proprietary software for making PCBs, I have yet to find an adequate <a href="http://en.wikipedia.org/wiki/FLOSS">FLOSS</a> solution for creating PCBs.  But once I have created the PCB, I use <a href="http://www.gimp.org/">The GIMP</a>, which is free software, to layout my PCBs on a page to print, so I can actually transfer them to Copper and etch them.
+</p>
+
+<p>
+	I've broken this information into 3 sections:
+	<ol>
+		<li><a href="#eagle">Export from Eagle</a></li>
+		<li><a href="#gimp">The GIMP</a></li>
+		<li><a href="#final">Final Remarks</a></li>
+	</ol>
+</p>
+
+<h2><a name="eagle">Export from Eagle</a></h2>
+
+<h3>Export the Bottom</h3>
+<p>
+	First you have to select what you want to print.  Use the eagle "display" tool to select.
+	<br>For the Bottom I select:
+	<ul>
+		<li>Bottom</li>
+		<li>Pads</li>
+		<li>Vias</li>
+		<li>Dimension</li>
+	</ul>
+	<i>For the Top I simply swap "Bottom" with "Top".</i>
+</p>
+
+<p> 
+	The bottom display selection:
+	<br><center><img src="/files/export-bottom0.png"></center> 
+</p>
+<p> 
+	What you should see in the board view:
+	<br><center><img src="/files/export-bottom1.png"></center> 
+</p>
+
+<p>
+	When you have selected what you want to print, go to File -> Print and then press the "Printer.." button.  Select "print to file" and give it a location "/tmp/bottom.ps" in my case.  You should see something simmilar to the image below:
+	<br><center><img src="/files/export-bottom2.png"></center> 
+</p>
+
+<p>
+	Click "OK" and then you should return to the main print dialog (shown below).  I select "Solid" and "Black" in the styles setting.  Hit "OK" to actually print to the file.
+	<br><center><img src="/files/export-bottom3.png"></center> 
+</p>
+
+<h3>Export the Top</h3>
+
+<p>
+	Repeat for the top of the board.. <strong>Note the difference in the style selection.</strong>
+</p>
+
+<p> 
+	The top display selection:
+	<br><center><img src="/files/export-top0.png"></center> 
+</p>
+<p> 
+	What you should see in the board view:
+	<br><center><img src="/files/export-top1.png"></center> 
+</p>
+
+<p>
+	Print -> Printer... just as you did for the bottom.  Print to file, give it a new file, "/tmp/top.ps" in my case, "OK".
+	<br>For the top of the board you want to also select <strong>"Mirror"</strong> in the style selection before you print.  Click "OK" to actually print to the file.
+	<br><center><img src="/files/export-top2.png"></center> 
+</p>
+
+<h2><a name="gimp">The GIMP</a></h2>
+
+<h3>Import Images</h3>
+
+<p>
+	Open the GIMP and open one of the post script or pdf files that you exported from Eagle.
+</p>
+
+<p>
+	You should see an import dialog like the one below, I use 300 dpi and strong anti aliasing.
+	<br><center><img src="/files/import0.png"></center> 
+</p>
+
+<p>
+	Once you click "Import" you should see your image full sized, in my case I started with the top layer.
+	<br><center><img src="/files/import1.png"></center> 
+</p>
+
+<p>
+	We want to get rid of the text at the bottom of the page.  Select the text with the box select tool, hit delete (not backspace) to erase the text [if you don't have delete you can always just use the bucket fill tool and fill with white.  The image below shows the selection you make.
+	<br><center><img src="/files/import2.png"></center> 
+</p>
+
+<p>
+	Then Select the whole page [Select All].  In the main menu go to Image -> Autocrop Image.  You should see something like the image below [just our PCB layout, nothing else around it].
+	<br><center><img src="/files/import3.png"></center> 
+</p>
+
+<p>
+	The next steps are optional.  I like to place text on my top layer.  Make it white, make it big, and put it on the black part [ground plane].
+	<br><center><img src="/files/import4.png"></center> 
+</p>
+
+<p>
+	As the top layer will actually be mirrored when you iron it onto your copper, you'll want to flip the text.  Select the text layer in the Layer Window [Windows -> Layers], go to Layer -> Transform -> Flip Horizontally.
+	<br><center><img src="/files/import5.png"></center> 
+</p>
+
+<p>
+	Repeat this import [without the text] for the bottom layer.
+</p>
+
+<h3>Layout On A Full Page</h3>
+
+<p>
+	Create a New File [File -> New -> US-Letter (300ppi) [or use the advanced options for a different size/resolution.. but use the same resolution as you used to import your top and bottom layers].
+</p>
+
+<p>
+	Add guides so that you can line up your imported PCB images on this larger page.  Place the mouse on the ruler, press the mouse button and drag a guide onto the image.  Make both a vertical and horizontal guide:
+	<br><center><img src="/files/full0.png"></center> 
+</p>
+
+<p>
+	Go to one of your import images [the bottom in this case], select all, and copy.  Then go to the new image, paste.
+	<br><center><img src="/files/full1.png"></center> 
+</p>
+
+<p>
+	Select the pasted layer in the Layer window, right click [on Linux at least], and make the pasted layer a 'new layer'.  I usually rename the layer too ["bottom" in this case (not shown here)].
+	<br><center><img src="/files/full2.png"></center> 
+</p>
+
+<p>
+	Line the layer up with the guides. 
+	<br><center><img src="/files/full3.png"></center> 
+</p>
+
+<p>
+	Create another guide under it, slightly offset.  Then copy and paste your other PCB layer [top in this case] just as you did with the previous layer (select all, copy, paste, new layer, lineup).
+	<br>When I have text on a PCB layer, I usually flatten the image before I copy it to the larger layout [Image -> flatten image].  This way there is only 1 new layer resulting from the copy/paste operation.
+
+	<br><center><img src="/files/full4.png"></center> 
+</p>
+
+<p>
+	I usually like to rotate one of the layers 180 degrees so that when I fold the page I can get them to line up [I'll do the top here].
+	<br>Select Layer in Layer window, then in the main window select Layer -> Transform -> Rotate 180 degrees.
+	<br><center><img src="/files/full5.png"></center> 
+</p>
+
+<p>
+	If you want to add duplicate copies of your PCB, add another guide to the right, slightly offset from the edge of your images, Go to the Layer window, duplicate both your layers and move them to line up with the new guide.
+	<br><center><img src="/files/full6.png"></center> 
+</p>
+
+<p>
+	I like to create a new layer under all of these layers [in Layer window right click -> New Layer.. then drag it below your top and bottom layers].  Then, with that new layer selected, use the box select tool to select an area around your pasted layers [but not too big so we don't waste a lot of ink when printing].
+	<br><center><img src="/files/full7.png"></center> 
+	<br>Finally use the bucket fill to fill that area with black [will just show black around your pasted layers].
+	<br><center><img src="/files/full8.png"></center> 
+</p>
+
+<h3>Print!</h3>
+
+<p>
+	Now we're ready to print.  I usually print to PDF so that I can take the image and print it elsewhere.  But if you want to print directly from the GIMP you can still follow the same directions, just select a printer instead of print to file.
+</p>
+
+<p>
+	Select File -> Print.  Then I select "Print To File" and select the location to print (usually /tmp/output.pdf for me).
+	<br><center><img src="/files/print0.png"></center> 
+</p>
+
+<p>
+	As we've created a full page sized image and sizing is important, we want to make sure that the GIMP doesn't mess with our dimensions (by default it actually does).
+	<br>Go to the "Image Settings" tab, select the "Ignore Page Margins" box.  Then increase the width/height so that it is the same as the sizing you originally selected for this full image [8.5 x 11 inches in my case].
+	<br><center><img src="/files/print1.png"></center> 
+</p>
+
+<p>
+	Finally select "Print" to actually print the full page layout [to a file in my case].  Then, you're DONE!
+</p>
+
+<h2><a name="final">Final Remarks</a></h2>
+<p>
+	If you only want to do one copy of your PCB you could place the top and bottom PCB layers side by side instead of above and below each other as I've done here.
+</p>
+<p>
+	If you want to add cutting guides you can easily do that with the pen tool along the guides you've created.  I didn't need them in my case because my PCB layers have a white section on the edge, so I just created the black background to guide my cutting.
+</p>
+<p>
+	After doing the editing of the top and bottom PCB layers, as well as the Full page, I save them as .xcf files [GIMP's image format], just in case I want to edit them again later.
+</p>

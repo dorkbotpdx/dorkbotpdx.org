@@ -1,0 +1,44 @@
+Fancy Oscilloscope
+2009-09-29 10:22:07
+paul
+
+Last night Monty brought a Tektronix MSO2024 oscilloscope to the meeting.  I've been very seriously considering buying one of these, or something similar (this model is $5400 new, about double my budget, though some lesser models are around $3200).  Read on for a lengthy writeup of how it went....
+
+<img src="http://www.pjrc.com/dorkbot/scope_monty_photo.jpg">
+
+First of all, I want to emphasize this scope and instruments like it are not designed for novice users.  It can do a lot of really amazing things, which might seem like the solutions to all electronics problems.  Tek's marketing people would certainly like you to believe that.
+
+In reality, just using the scope requires quite a lot of knowledge and experience. Often times it can be a mini problem solving exercise to go from "why isn't it showing what I want?" to answers like "oh yeah, it's still in that triggering mode".  Using it requires methodology of knowing what your waveform should look like to adjust the scope's MANY options, and usually only then can you start to do meaningful things.
+
+There are lots very helpful on-screen displays and menus.  Most use brief terms and symbols that are very meaningful to anyone with some experience with oscilloscopes.  Monty was pretty familiar with the menus and worked them often, but several times I did too and after about 10 minutes using the scope I was pretty comfortable with what most things did.  There were a couple minor misunderstandings on my part within those first minutes, like trying to use the largest knob to change the time base (it's actually a pan and zoom), but in minutes I was able to use it pretty well.  Then again, I've been using oscilloscopes (mostly analog ones) for about 20 years.
+
+One important feature, which pretty much all good digital scopes have these days, is a USB port where you can plug in a USB flash drive and get data capture.  For example, you can easily capture the screen to a PNG file.  Here's the first one we tried.
+
+<img src="http://www.pjrc.com/dorkbot/tek00000.png">
+
+This picture really shows the long record length (buffer), which to me is probably the most important feature.  Two channels are in use, and each is shown twice. The small region on the top is the entire time that's been captured by the scope into its buffer, which is many milliseconds.  The larger bottom panel is showing 20 us, where the tiny gray rectangle in the top panel represents the portion of the buffer displayed large bottom panel.
+
+In this view, the yellow is an analog signal.  I had a Teensy running code which would charge a 100 uF capacitor for 10 ms (by setting a pin to output mode and driving it high), then let it discharge with a 10k resistor which was in parallel with the cap (by turning the pin back to input mode).  On the top panel, you can see the last bit of the charging and some of the slow decline in voltage.  The scope was set to trigger at about 4 volts, near the top of the charged voltage.
+
+Right after charging the cap, the code would send a message via the UART, which is the blue trace.  The long record length lets you grab a pretty substantial period of time and then hunt around with the pan and zoom knob to find and investigate interesting things.
+
+This scope had the optional (and $700 extra) computer analysis software installed. Monty spent a while fiddling with the menus to get it turned on.  Like so many fancy features, it requires quite a bit of fiddling and manipulating menus.  For quite a while it was showing wrong information... and I even looked up ascii codes and wrote out bit patterns on a scrap of paper to figure out how its interpretation of the bits might correspond to what they were should be (I'm pretty sure my code works and outputs correct data!)  After some guesswork, it ultimately turned out the scope was interpreting in the opposite polarity, which would have been correct for a RS-232 voltage, but this was a TTL-level signal right on the processor's pin.  Monty inverted that channel, as you can see if you compare the screen above to this one, and suddenly the correct bytes appeared!
+
+<img src="http://www.pjrc.com/dorkbot/tek00001.png">
+
+Here it is zoomed out a little more, so you can see the whole message.
+
+<img src="http://www.pjrc.com/dorkbot/tek00002.png">
+
+And here is the code that was doing all this.  The last line sends that message. The code above it charges the capacitor (pin 8) and blinks the LED (pin 6).
+
+<img src="http://www.pjrc.com/dorkbot/screen.png">
+
+
+(edited)
+
+
+Originally I wrote a rant here about the slow, sluggish user interface on this scope.  On reflecting a bit, I decided to edit this bit of negativity out... of course, if you really want to see the original (especially if you're a product manager at Tek with any influence over future scope specs), just email me at paul at pjrc dot com and I'll send you the original.
+
+The short story is, while I really love everything this scope can do, the slowness in the user interface would result in my using it only when I absolutely had to.  I'm just not ready to blow $5k or $3k (without the digitial channels and only 100 MHz BW) for something I wouldn't actually want to use unless I had no other choice.
+

@@ -1,0 +1,18 @@
+Multi board madness!
+2010-04-08 15:28:11
+wbowers9000
+
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/3%20Boards.jpg'/></p>
+<p>I'm working on getting these three boards to talk to each other using I2C. By the way I'm having a devil of a time getting multiple images into 1 blog. So let's see what happens. I'm still real new to this blogging thing.</p>
+<p>Here is my latest hack.</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Teensy%20on%20PIC%20DEM%202.jpg'/></p>
+<p>Microchip must really love this! This is a PIC DEM 2 demo board used to host a Teensy++ board. It had all the stuff I needed to test on the demo board; LCD, LED, MAX232, and buttons.</p>
+<p>I ran into a lot of trouble getting the MAX232 to work. Nothing to do with the board. The culprit was a Windows XP update that came at an inopportune time which changed settings that the Arduino toolchain used for getting feedback from the Teensy board. I don't know about everyone else but I like verification that everything is working during every phase of a project. Feedback is crucial. That led to several wasted hours. I'm now about to correct that errant setting and see if that fixes the problem. I'd like to thank Paul Stoffregen for his insight into this problem. Check out his online store at www.prjc.com. Hey Paul, hows that for a (well deserved) shameless plug! LOL.</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Teensy%20with%20LCD.jpg'/></p>
+<p>This board hosts a Teensy++, an I2C eeprom, and a 16x2 LCD display. I have yet to test the eeprom, but everything else work great.</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Propeller%20Board.jpg'/></p>
+<p>Once I get everything working on the I2C bus I'll add this Propeller board to the mix. What is not shown is the 3.3V to 5V converter that I have yet to test.</p>
+<p>Note the bottom board in the picture with the 3 boards; there is a space wired up so I can move the 16x2 LCD from one board to another. That board will be dedicated to to programming my Brush Bot. That's the group project that the Portland Area Robotics Society (PARTS), www.portlandrobotics.org, is working on right now. I'd recommend that some of you Arduino enthusiasts come to the PARTS meetings on the first Saturday of every month at 10:30 am. There is a lot of great Arduino insight to be had there as well as a lot of different cool stuff to be seen. Also, I'll be asking how the Arduino board is being used to program a bootloader or is using a bootloader or.... I'm not sure. But I know that the PARTS group will fill me in in the next meeting.</p>
+<p>William Bowers</p>
+<p><br /></p>
+

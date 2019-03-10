@@ -1,0 +1,11 @@
+Your Old Technology Cannot Defeat Me!
+2011-02-02 21:22:43
+spacewrench
+
+<p>My house has/had an old alarm system with keypads and sensors here &amp; there. However, the control unit was old and decrepit and had no security system behind it, so I yanked it out and tossed it. (Still in the junk pile if anybody wants it -- it was high-zoot back in the day, with a phone dialer and everything!)</p>
+<p>I didn't like having dead keypads around, nor the idea of pulling them and patching the drywall, so I took one apart to figure out how to interface to it. And now I know. It's pretty neat: 10 wires go everywhere, and there are 10 LEDs, a beeper, and a 12-key pad at each station. 12V/GND use two wires, 3 LEDs are powered directly, there's a read/write signal, and 4 wires are either the encoded key state or address and data lines for an 8-bit latch that runs the other 7 LEDs and the beeper.</p>
+<p>And now I have full control of all of it, from an ATmega328. Well, all except the keypad. I still have to build a level-shifter buffer (maybe just a resistor divider will work).</p>
+<p>Next up, picking a chip with enough GPIOs to run the keypads and accept a half-dozen motion sensors, window/door switches and so on. Plus logic for checking/setting alarm codes, internet connectivity to report problems, and maybe even a cellular module (with a prepaid SIM card) for phoning me.</p>
+<p>It would probably be cheaper to just buy a new security system, but this way is more fun.</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/XL1219F-t.png'/></p>
+

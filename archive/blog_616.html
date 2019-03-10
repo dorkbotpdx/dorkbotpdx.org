@@ -1,0 +1,13 @@
+Averaging Hum Away
+2010-09-21 07:50:49
+WardCunningham
+
+<p>One often averages many measurements in order to cancel out errors. A lot of the noise in my shop comes from 60Hz power-line hum so to make measurements I average over 1/60th of a second, one complete cycle of the interfering noise. With my recent <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/sensorserver_transitions_to_txtzyme">SensorServer conversion</a> I started applying this technique everywhere which lead to a surprising result on one particular channel:</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Screen%20shot%202010-09-21%20at%206.26.00%20AM.png'/></p>
+<p>This shows my power-line waveform monitoring channel: All noise by this definition. Notice that it drops to near zero (peak-to-peek) on Sept 20. That's when my sensor network conversion happened (time here is reported in GMT.) I noticed the change a day later, wondered why it didn't drop all the way to zero, and started investigating.</p>
+<p>I had been taking samples, 100 at a time, with the <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> code "100{4sp150u}". This says, sample and print channel 4, wait 150usec, repeat. The timing is approximate here, because the other instructions take microseconds too. I ball-parked these numbers when dealing with my first hum problem. Maybe I can do better.</p>
+<p>I wrote a command line script to sweep through various repeat counts, thereby varying slightly the period over which I observed the hum. I figured one of these values would be close to the desired 1/60 second. I'd know I had found the ideal number when the peak-to-peak value was the smallest. Here's what I found:</p>
+<p><img alt='img' src='http://dorkbotpdx.org/files/images/Screen%20shot%202010-09-21%20at%207.38.24%20AM.preview.png'/></p>
+<p>This shows that collecting 107 samples more correctly averages over the desired interval. It also tells me how fast Txtzyme runs by measuring it against the ac power as a timebase. If 107 iterations equals 1/60 second, then one iteration equals 155.8 microseconds. That means my loop overhead is 5.8 microseconds. Not bad.</p>
+<p>I changed the loop count in my acquisition logic the next day and this shows in the first graph as a peak-to-peak amplitude of darn near zero. Cool, eh?</p>
+

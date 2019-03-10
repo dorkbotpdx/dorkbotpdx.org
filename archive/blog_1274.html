@@ -1,0 +1,103 @@
+Monolith Synth
+2017-05-23 11:06:48
+paul
+
+Over the last several weeks I collaborated with Ben Davis, Darcy Neal and Ross Fish on this Monolith Synth interactive sculpture we took to <a href="http://www.tested.com/art/makers/613382-building-and-playing-monolith-teensy-powered-synthesizer/">Tested</a> and Maker Faire.
+
+<iframe width="640" height="360" src="https://www.youtube-nocookie.com/embed/gL5llIO3NcU?rel=0" frameborder="0" allowfullscreen></iframe>
+
+This was a pretty typical usage scene at Maker Faire:
+
+<blockquote class="instagram-media" data-instgrm-version="7" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:658px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:8px;"> <div style=" background:#F8F8F8; line-height:0; margin-top:40px; padding:33.3% 0; text-align:center; width:100%;"> <div style=" background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURczMzPf399fX1+bm5mzY9AMAAADiSURBVDjLvZXbEsMgCES5/P8/t9FuRVCRmU73JWlzosgSIIZURCjo/ad+EQJJB4Hv8BFt+IDpQoCx1wjOSBFhh2XssxEIYn3ulI/6MNReE07UIWJEv8UEOWDS88LY97kqyTliJKKtuYBbruAyVh5wOHiXmpi5we58Ek028czwyuQdLKPG1Bkb4NnM+VeAnfHqn1k4+GPT6uGQcvu2h2OVuIf/gWUFyy8OWEpdyZSa3aVCqpVoVvzZZ2VTnn2wU8qzVjDDetO90GSy9mVLqtgYSy231MxrY6I2gGqjrTY0L8fxCxfCBbhWrsYYAAAAAElFTkSuQmCC); display:block; height:44px; margin:0 auto -44px; position:relative; top:-22px; width:44px;"></div></div><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/p/BUU4nbyl7WL/" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A post shared by Darcy Neal (@drc3p0)</a> on <time style=" font-family:Arial,sans-serif; font-size:14px; line-height:17px;" datetime="2017-05-20T19:43:39+00:00">May 20, 2017 at 12:43pm PDT</time></p></div></blockquote>
+<script async defer src="//platform.instagram.com/en_US/embeds.js"></script>
+
+This crazy adventure started with Kickstarter reached out to me, only 6 weeks before Maker Faire, looking to showcase 4 successful projects in their booth.  They wanted to show "creative tools" and how people used them.  So I reached out to a few synthesizer folks I've met and who've used Teensy.  They also suggested bringing it to Tested to make a video.  So it began...
+
+From the beginning I had a step sequencer using illuminated arcade buttons in mind.  So I quickly designed this little <a href="https://oshpark.com/shared_projects/jiW2r6f5">I/O expander board</a> and sent it off to OSH Park's Super-Swift service.
+
+<a href="https://oshpark.com/shared_projects/jiW2r6f5"><img src="https://www.pjrc.com/teensy/monolith_synth/ioexpander_pcb.png"></a>
+
+The whole project came together over just 4 weeks.  Our first meetup was just to discuss what to build, followed a week later by our first build night.  By then the I/O expander boards had arrived.  We made not the final Monolith, but 3 breadboard prototypes, so the software development side could begin!
+
+<iframe width="640" height="360" src="https://www.youtube-nocookie.com/embed/xNwWRTHW3o8?rel=0" frameborder="0" allowfullscreen></iframe>
+
+Another meetup focused only on software.  Almost all the software was developed on these prototype panels.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/prototype.jpg">
+
+In this picture you can also see the panel layout sketches on the notepad on the right side, and a blue tape model underneath on the table, which we made to get an idea of the overall size.
+
+Ross and Darcy had synthesis plans that needed a signal-controlled PWM waveform and improvements to the envelope feature, so I worked on improvements to the <a href="https://www.pjrc.com/teensy/td_libs_Audio.html">Teensy Audio Library</a> while they wrote the Arduino sketch code.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/pwm_dev.png">
+
+The day before our next meetup, I started turning those sketches into a design for the laser cutting.  I made this 1/4 scale model of the front and side pieces.  At this point, none of the back side or interior ribs (for strength) had been designed, and you can see the model lacks the many holes for screws & brackets which joined everything.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/cardboard_model.jpg">
+
+Only 2 weeks before Maker Faire we had an epic 13-hour build day where all the final parts were laser cut and assembled.  Here's a photo of Darcy & Ben putting the panels together on my kitchen counter!
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/building.jpg">
+
+All the clear acrylic plastic parts were completely drawn, with all mounting holes, and made that day.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/lasercut.jpg">
+
+Here's the complete layout of all parts (mk2017_design):
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/mf2017_laser.png">
+
+Here's a <a href="https://www.pjrc.com/teensy/monolith_synth/mf2017_laser_large.png">large high-res copy of this image</a>, and a <a href="https://www.pjrc.com/teensy/monolith_synth/mf2017_laser_files.zip">big ZIP file with all the original Corel Draw files</a> for anyone who wishes to try making their own.
+
+While the laser did most fabrication work, other steps like countersinking for the potentiometers were needed.  It was indeed an epic 13 hour day of making.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/machining.jpg">
+
+A couple days later, I spent a whole day completing the wiring we couldn't get done in those 13 hours.  Erin Murphy (the "Soldering Goddess" at PJRC) put in a few hours on aesthetic improvements to the messy tangle of wires from so many buttons.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/wiring.jpg">
+
+Just a few days later we had our last "build" session, to get the 3 separately written Arduino sketches merged and working together as one integrated project.  Even though everything has been designed to go together, this session went very late.  Ben did much of the heavy lifting to merge the 3 programs.
+
+This is the final audio DSP system settled upon that late night.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/audiosystemonly_small.png">
+
+Here's a <a href="https://www.pjrc.com/teensy/monolith_synth/audiosystemonly.png">large high-res copy of this image</a>.
+
+This was the first actual usage of the Monolith, well past 1am when we finally had it all up and running.
+
+<iframe width="640" height="360" src="https://www.youtube-nocookie.com/embed/38M7I6YjyTw?rel=0" frameborder="0" allowfullscreen></iframe>
+
+The next day I took it all apart and packed all the pieces and spare parts into these 2 big boxes, weighing in at 55 and 40 pounds!
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/boxes.jpg">
+
+This is the first time I've ever shipped a project to Maker Faire, rather than driving a truck or hauling cases of checked baggage on a plane.  So much easier, and it allowed time to work on a nice handout card.  After some back and forth with the others and last-minute proof reading by Robin, who caught what would have been embarrassing typos and grammatical errors, we sent this card off to be fast-turn printed.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/card_mf2017_front.png">
+Here is a <a href="https://www.pjrc.com/teensy/monolith_synth/card_mf2017_front.pdf">printable PDF file for the front side</a>.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/card_mf2017_back.png">
+Here is a <a href="https://www.pjrc.com/teensy/monolith_synth/card_mf2017_back.pdf">printable PDF file for the back side</a>.
+
+Darcy and I flew to San Francisco early and spent the day with Tested, putting it back together while they shot that awesome video.  Sometime I hope to have even 1/10th that sort of video production skill.
+
+Since it was already put together, we had little to do setup-wise.  Friday morning Ben, Ross and Darcy did some adjustments of the sound levels which really made it come to life in the space.  For anyone who wishes to dig deeper into the technical details, the<a href="https://github.com/PaulStoffregen/MakerFaire2017">complete source code is available on Github</a>.
+
+All weekend long people really enjoyed playing with it.  There were many really awesome moments, like this one:
+
+<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F1106862845%2Fvideos%2F10211314649037776%2F&show_text=0&width=560" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>
+
+Here is <a href="https://www.kickstarter.com/blog/kickstarter-at-the-2017-bay-area-maker-faire">Kickstarter's coverage of the event</a>.  Scroll down a bit to the part about Teensy.  :)
+
+During the 3 days of Maker Faire, things went very well.  We did experience a couple minor issues.  Massive electrical noise from so many other projects played havoc with the capacitive touch sensing.  Saturday evening I rewrote the code to look for changes from an average rather than just an increase from a threshold, which allowed it to usually work well enough.  The other tech issue was a bass.  When turned up louder, the bass notes would shake all the plastic panels, rattling screws and even some of the connectors loose at time.  Easy to fix.
+
+Towards the end of Sunday, the Maker Faire folks came around and gave up an award.  At first I shrugged it off, since they've done the same for other stuff I've brought in prior years.  But those were the blue ribbons.  Apparently the only hand out one of these red one each in "zone".  They said it's a big deal...
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/award.jpg">
+
+Really, the best thing about this year was working with a great team.  Ross, Darcy and Ben really stepped up and did a great job on so many parts.
+
+<img src="https://www.pjrc.com/teensy/monolith_synth/group_photo.jpg">
+

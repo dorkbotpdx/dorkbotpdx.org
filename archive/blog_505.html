@@ -1,0 +1,199 @@
+Thanks to Paul!
+2010-05-11 21:37:39
+Huck
+
+/* He whipped up this nifty little display driver code for my 5x7 LED Matrix so I could make blinky things!
+--------------------------------------------------------------------------------------------------------------------- */
+<code>int row[7] = {10,13,9,6,2,8,3};
+
+int col[5] = {12,4,5,11,7};
+
+int pixels[7][5];
+
+int i = 0;
+//Paul whipped this up in like 10 minutes off the top of his head(worked perfect 1st time too) THANKS!
+unsigned char display_data[5];
+
+void write_7_pins(unsigned char c)
+{
+  c ^= 255;
+  digitalWrite(10, (c & 1));
+  digitalWrite(13, (c & 2));
+  digitalWrite(9, (c & 4));
+  digitalWrite(6, (c & 8));
+  digitalWrite(2, (c & 16));
+  digitalWrite(8, (c & 32));
+  digitalWrite(3, (c & 64));
+}
+
+ISR(TIMER2_OVF_vect)
+{
+  static unsigned char col=0;
+  
+  if (col == 0) {
+    digitalWrite(7, LOW);
+    write_7_pins(display_data[0]);
+    digitalWrite(12, HIGH);
+  } else if (col == 1) {
+    digitalWrite(12, LOW);
+    write_7_pins(display_data[1]);
+    digitalWrite(4, HIGH);
+  } else if (col == 2) { 
+    digitalWrite(4, LOW);
+    write_7_pins(display_data[2]);
+    digitalWrite(5, HIGH);
+  } else if (col == 3) {
+    digitalWrite(5, LOW);
+    write_7_pins(display_data[3]);
+    digitalWrite(11, HIGH);
+  } else if (col == 4) {
+    digitalWrite(11, LOW);
+    write_7_pins(display_data[4]);
+    digitalWrite(7, HIGH);
+  }
+  col++;
+  if (col >= 5) col = 0;
+}
+// END OF GROOVY PAUL CODE other than 4 lines in setup()
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(0, INPUT);
+  pinMode(1, INPUT);
+  for(int x = 2; x < 14; x++) {
+    pinMode(x, OUTPUT);
+  }
+  for(int y = 0; y < 7; y++) {
+    digitalWrite(row[y], HIGH);
+  }
+  for(int y = 0; y < 5; y++) {
+    digitalWrite(col[y], LOW);
+  }
+  // display_data[1] = 0b01101101; PAUL showed me how to output entire byte at once
+   TCCR2A = 0x00;  // Paul code.. I have no idea what this does yet ;)
+   TCCR2B = 0x03;  // Paul code.. I have no idea what this does yet ;)
+   TIMSK2 = 0x01;  // Paul code.. I have no idea what this does yet ;)
+}
+
+unsigned char vsec, vmin, vhr = 0;
+
+void loop() {
+GoodTimes(); //Binary Clock anybody?! :)  (note: wife said I'm a nerd but was happy for me)
+  
+/*  ***THIS WAS EGOTISM AT ITS BEST*** (note: didn't impress the wife either)
+  H();
+  U();
+  C();
+  K(); 
+  display_data[4] = testvar;
+  testvar = testvar + 1;
+  delay(1000);
+Serial.println("test"); 
+*/
+ }
+
+void GoodTimes() {
+  display_data[0] = vsec;
+  display_data[4] = vmin;
+  display_data[2] = vhr;
+  delay(1000);
+  vsec = vsec + 1;
+  if(vsec >= 60) {
+    vmin = vmin + 1;
+    vsec = 0;
+  }
+  if(vmin == 60) {
+    vhr = vhr + 1;
+    vmin = 0;
+  }
+  if(vhr == 24) {
+    vhr = 0;
+    vmin = 0;
+  }
+
+int setmin = analogRead(0);
+if(setmin <500) {
+    if(vmin == 60) {
+    vmin = 0;
+    } 
+    else 
+    {
+    vmin++;
+    vsec = 0;
+    }
+}
+int sethr = analogRead(1);
+if(sethr < 1000) {
+    if(vhr == 24) {
+    vhr = 0;
+    } 
+    else 
+    {
+    vhr++;
+    vsec = 0;
+    }
+}
+
+
+}
+void H() {
+  unsigned char h[5] = {0b00111110, 0b00001000, 0b00001000, 0b00001000, 0b00111110};
+  for(int i = 0; i < 5; i++) {
+    display_data[i] = h[i];
+    delay(10);
+    if(i >= 4) {
+      delay(150);
+      for(int x = 0; x < 5; x++) {
+      display_data[x] = 0b000000000;
+      delay(10); 
+      }
+    }  
+  }
+}
+
+void U() {
+  unsigned char u[5] = {0b00111110, 0b00100000, 0b00100000, 0b00100000, 0b00111110};
+     for(int i = 0; i < 5; i++) {
+    display_data[i] = u[i];
+    delay(10);
+    if(i >= 4) {
+      delay(150);
+      for(int x = 0; x < 5; x++) {
+      display_data[x] = 0b000000000;
+      delay(10); 
+      }
+    } 
+  }
+}
+
+void C() {
+  unsigned char c[5] = {0b00111110, 0b00100010, 0b00100010, 0b00100010, 0b00100010};
+     for(int i = 0; i < 5; i++) {
+    display_data[i] = c[i];
+    delay(10);
+    if(i >= 4) {
+      delay(150);
+      for(int x = 0; x < 5; x++) {
+      display_data[x] = 0b000000000;
+      delay(10); 
+      }
+    } 
+  }
+}
+
+void K() {
+  unsigned char k[5] = {0b00111110, 0b00001000, 0b00010100, 0b00100010, 0b00000000};
+     for(int i = 0; i < 5; i++) {
+    display_data[i] = k[i];
+    delay(10);
+    if(i >= 4) {
+      delay(1000);
+      for(int x = 0; x < 5; x++) {
+      display_data[x] = 0b000000000;
+      delay(10); 
+      }
+    } 
+  }
+}
+</code>

@@ -1,0 +1,65 @@
+Sparkfun El Sequencer Trouble...
+2011-05-23 04:33:29
+paul
+
+<b>Update, July 14, 2011:</b> Sparkfun contacted me... they're planning to fix these problems.
+
+Over the last week, Mykle and I have been helping the <a href="http://www.handeyesupply.com/">Hand-Eye Supply</a> folks with a float for the upcoming <a href="http://www.rosefestival.org/events/starlightparade/">Starlight Parade</a>.  It has 114 El Wires from Coolneon!  We're using the only off-the-shelf el wire sequencer available, made by Sparkfun (a new 10 channel board has recently been announced by Coolneon... and perhaps if you're reading this after 2011, maybe I'll make a better one someday).
+
+Sadly, the Sparkfun El Wire Sequencer board has been nothing but trouble.  Mykle insisted I write up a list of all the problems, so anyone else struggling to use these boards might find this info.  Click "read more" for the ugly details...
+<!--break-->
+
+First of all, some of these problems may be less severe, or perhaps not even issues at all, in less demanding applications.  We're connecting 8 feet of El Wire to each channel.  However, the el wire we're using is a higher brightness type.  I measured approx 44 nF.  I saw a "rule of thumb" on Coolneon's site that el wire is about 1 nF per foot.  So perhaps we're really connecting the electrical equivalent of 44 feet of el wire to each output?
+
+All these issues are related to "v14", which is <a href="http://www.dorkbotpdx.org/files/sequencer-v14.pdf">this schematic</a>.  Perhaps someday Sparkfun will improve this board, so if you're reading this long after summer of 2011, please compare versions and schematics carefully.
+
+The first easy issue is there's no common ground connection between the AVR chip's ground, called "GND" on the schematic, and the triac ground, called "HCGND" on the schematic.  At first, I connected them by soldering a wire between pads on the board.  There's no obvious place on the board to make such a connection, and no documention from Sparkfun that it's necessary.
+
+Without these two grounds connected, there's no return path for the triac trigger current which flows out of the processor pin, and though one of the 1K resistors to turn on that triac.  If used this way, as I'm sure many hobbyists have probably done, the current must flow back through the other 7 triacs and their resistors!
+
+The high voltage inverters we're using are the Coolneon "Big Boy Driver" model.  I measured with an ohm meter to check... their output is completely isolated from the input.  However, if the Sparkfun sequencer were used with some other inverter which didn't have fully isolated output, then the 2 grounds would likely be connected through the inverter.  That wasn't the case for me.
+
+Initially I connected HVGMD to GND, and I drove the pins to HIGH to turn the triacs on, LOW to turn them off.  Later I decided to connect HVGND to VCC, and diver LOW to turn the triacs on.  I'll explain why in a moment...
+
+The next major problem I hit was the 1K resistors on the board aren't always adequate to trigger the triacs.  With the processor running at 3.3 volts, and the triac's input P-N junction about 0.6 volts (yes, I measured), that's only 2.7 volts across the 1K resistor, or 2.7 mA.
+
+These triacs are rated for 3 mA trigger current.  However, if you read the datasheet, you'll see the spec is actually 5 mA when the triac is being driven with a positive voltage on its gate while it has a negative voltage on the switched terminal.
+
+I had problems where some triacs just wouldn't turn on.  They were flakey, sometimes working, other times not.  When I finally looked with a scope (and a little hesitation putting so much voltage onto my poor little/cheap Rigol scope), sure enough I saw the entire AC waveform on the triac output, shifted about -200 volts, so the positive peaks where coming right up to ground.
+
+I swapped all the 1K resistors for 220 ohms, which is about as much current as the poor little AVR can output when running with only 3.3 volts.  1 board isn't so bad... all 17 boards took a few hours!  That solved the failure-to-turn-on problems.
+
+Later I decided to connect HVGND to VCC, so the triacs always see a negative trigger voltage, which avoids using them in the mode where 5 mA is the spec.  Maybe that alone would work with the 2.7 mA current as originally designed, since it's so close to the 3 mA spec?
+
+It would have been nice if the processor ran at 5 volts.  In fact, I had thought it was 5 volts.  Nowhere is the 3.3 volt supply documented.  The "+5V" label on the schematic near JP3 is incorrect.  It's really 3.3 volts.
+
+There no documentation on which regulator (U10) Sparkfun used on these boards.  However, nearly all voltage regulator datasheets strongly recommend a decoupling capacitor at their input if the power arrives via a "long" wire (eg, one with some inductance that matters).  There's no such capacitor in the Sparkfun design.  :-(  I'm planning to mod one in... times 17 boards!
+
+Another problem, which luckily has not (yet) caused me much pain, but I've seen mentioned elsewhere from people struggling with these boards, is the AVR's likelihood of unintentional reset.  I had this happen several times when my finger accidentally touched the reset pin on the 3x2 AVR-ISP headers I'd added.
+
+The board has a 10K pullup resistor on the reset pin.  Normally that would be plenty.  But with that "Big Boy Driver" creating about 100 Vac at a couple kHz, it only takes a tiny bit of capacitive coupling from any high voltage line to reset to induce a couple voltage and reset the AVR.
+
+Worse yet, the reset is connected to the DTR pin by a 0.1 uF capacitor.  I'm not using that pin, but if somewhere were to connect a wire between that pin and a USB-serial converter, and especially if that wire were not well shielded, it doesn't take much coupling to accidentally reset the AVR, since the coupling is to a huge AC voltage at a pretty decent audio frequency (eg, much easier to couple than normal 50 or 60 Hz).
+
+Probably my biggest complaint about Sparkfun's design is the lack of a zero cross detector.  Without one, there's no way the code can know what phase of the waveform the triac triggering within.  It could be near the zero, or near either positive or negative peak.  It also means any attempt at dimming needs to switch on for several cycles, off for several.  Using 2.5 ms intervals, I was able to achieve several levels of brightness.  But the timing must be course because switching can happen anywhere within the AC cycle.
+
+We're still experiencing problems with the triacs failing as "always on".  So far, this isn't resolved.  My best guess at this point is those poor tiny triacs are sometimes getting switched on at or near the crest of the AC waveform, where the peak voltage is nearly 180 volts.  It has to suddenly charge about 44 nF of output capacitance.  Maybe the peak current is too high?  Maybe zero cross switching would help?
+
+Tonight we're running a test, where 1 board is driving 8 el wires directly, and another is driving 8 of them through 25 ohm resistors (little bundles of four 100 ohm resistors, since those are what I had on-hand, spliced into "extension cables" going to the el wires).  If the voltage is at 180 or -180 volts peak, those resistors ought to limit the peak current to "only" 7.2 amps!  I picked this based on Figure 2 in the triac datasheet, which says the triac can handle an 8 amp "maximum permissible non-repetitive peak on-state current".  The chart indicates 1 cycle of 50 Hz.  The 44 nF capacitance and 25 ohms is only 1.1 ms time constant, which is a lot less than a cycle of 50 Hz.
+
+Meanwhile, I've already desoldered and replaced 10 triacs across 4 of the boards we've been using.  Hopefully those resistors will solve the triac deaths and only 1 more board will need some of its triacs replaced.
+
+While replacing triacs, I was amazed by the board's poor high voltage spacing design.  Normally when wires have 100 volts (and 100 volts AC, which is a 180 volt peak), you try to keep some separation between those lines.  From the triac to the connectors, there's about 1mm spacing, which isn't that bad.  However, the triac tab is "hot", since it's connected to the center terminal.  The microprocessor section has a ground pour (which is different from an unbroken ground plane... a pour with lots of traces breaking it up has little to no advantage that an unbroken plane would have).  The ground pour comes dangerously close to those triac tabs.  I didn't measure it carefully, but it appears to be only whatever the minimum trace/spacing is, perhaps 0.008 or 0.010 inch?
+
+So far, there's no indication there's actually been breakdown across that thin spacing, but if triacs keep dying with those 25 ohm resistors in-line, maybe this'll be the next place I investigate?  Or maybe I'll end up trying to kludge a voltage comparator chip onto the boards to get true zero cross detection (and of course rewrite my code to use it).
+
+Early on, before I discovered the triacs were only triggering reliably on the positive half of the cycle, I suspected the "Big Boy Driver" might be creating nasty spikes.  Now I suspect those fears may have been unfounded.  Still, I built a little low-pass filter using 10 ohm (5 watt, but 1 or 2 would probably be ok) resistors and 22 nF capacitors.  The capacitors need to be rated for AC.  I used Digikey part P10726-ND, which I'm still not 100% sure is good for 100 Vac at this higher frequency, but at least the 275 Vac rating sounds reassuring, even if it is probably only qualified for 60 Hz (the datasheet for that part isn't specific on that point).  I also added a varistor in parallel with the capacitor, part number 495-3785-ND.  The cap + varistor combo ought to prevent any nasty spikes from reaching those little triacs, and of course the 10 ohm resistor dramatically helps to give the energy a place to dissipate.  These parts are bulky, but cheap.  Anyone considering a better El Wire controller design ought to include them, so one unfortunate high voltage spike doesn't take out the whole board.
+
+One final note I have is regarding the connectors.  They seem to be the JST PH series, specifically Digikey 455-1749-1-ND, or 455-1704-ND in through hole.  The "mating products" link on Digikey can take you to the housings and crimp contacts.  I ordered a few, but not the expensive crimp tool.  If you're curious how expensive a tool might be, search for 455-2047-ND, or the much more economical 455-1128-ND.
+
+One point to notice on the JST PH connectors is they are specified for 100 volts maximum.  With the pins only 2mm apart, and spacing between the pads on the PCB only about 1mm, that's not so surprising.  But it does make me wonder if anyone at Sparkfun considered that rating when standardizing on these for el wire which is typically driven at 100 volts or more?
+
+So there is it, a lengthy post about all the issues I've encountered with these Sparkfun El Sequencer boards.  To be honest, I'd always assumed Sparkfun put considerable engineering work into their products.  Maybe this one is an exception?
+
+Anyway, hopefully anyone else struggling to actually use this board might find this long-winded blog post helpful?
+

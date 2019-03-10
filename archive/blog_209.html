@@ -1,0 +1,29 @@
+Some of the tiniest soldering I've ever done
+2008-08-27 23:46:25
+breedx
+
+In the last week or two I've been doing some of the smallest soldering I've ever attempted.
+
+It all started with the KOLPXNTY board I've been designing and prototyping. I won't dive into detail here (maybe later!?), but the basic goal is to trigger a fairly large number of circuit bent devices from a networked computer.
+
+<img src="http://noisybox.net/weblog/images/kolpxnty_prototype.jpg" alt="kolpxnty"/>
+
+I'll put up a documentation page if/when it's more relevant.
+
+Although this certainly not rocket science, it's certainly the most complex 2-sided surface mount board I've attempted to design. Briefly, there are a few buses, a lot of traces, and a shitton of vias (for my amateur hand anyway). I soldered down the teeny LEDs and 6 small SMT chips and the bypass caps and resistors and rested confident in knowing that even though the board was hand-ironed and soldered haphazardly, that it was good and efficient and tight.
+
+Then I decided to finally build out the benito kits that I scored from Dorkbot Don a month or longer ago.
+
+<img src="http://noisybox.net/weblog/images/benito_done.jpg" alt="the little tuff one"/>
+
+Let's be clear -- this shit is pretty damn small. It's not exactly microscopic. It's still hand soldered, but wow, it's really tight. The TQFP part is really hard not to bridge, but the braid will save you. The LEDs are really light and challenging, but totally doable if careful. The remainder of the SMT parts (caps and resistors mostly) are surprisingly fun to mount and actually save you the trouble of cutting those long leads (like on thru-hole parts).
+
+I built two of them and although I managed to ruin one of the LEDs on one of the boards, I have been able to confirm that they're both functional.
+
+Don has really done some great and amazing work here!
+
+Let's be absolutely clear: He's designed and built us a cheap and readily available platform that can act as a usb<->serial bridge, an Atmel programmer, or even more generally, a really great cheap and open platform for USB+AVR hacking. Wanna control a servo? Sure, this can do it! Wanna read from an SPI sensor? Sure, this can do it too!
+
+It's still probably in need of some general purpose cross-platform code and reusable modules, but what a great small, cheap, and efficient platform on which to build computer-enabled projects! It think it was nearly ten years ago that I read about the death of the serial port and the future of this newfangled USB thing.
+
+It was a hobbyist nightmare. How were (are?) we going to deal with the insanity? Other than the overpriced FTDI chip (not to fully knock it -- that chip is great), the benito is the first real usb platform that does what we hobbyists kinda want. Granted the software has to be there to support it -- and it will follow soon. Pay attention. :)
