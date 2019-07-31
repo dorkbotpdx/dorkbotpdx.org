@@ -3,15 +3,15 @@ Pulse Measurement with Txtzyme
 WardCunningham
 
 <p>Parallax's nifty little sonar uses a single signal line to both trigger a measurement and return a result. The result comes back as a variable width pulse from which one can determine the round trip transit time and from that distance to the acoustic reflector.</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/IMG_0176.jpg'/></p>
-<p>I used existing <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> tools to study this behavior and then improved Txtzyme to simplify this sort of measurement. I used the <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/txtzyme_javascope_feeds_javas_2d_graphics">Javascope</a> viewer from an earlier project to capture images of the return pulse that looked like this:</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/Screen%20shot%202010-08-15%20at%203.25.00%20PM.png'/></p>
+<p><img alt='img' src='/files/images/IMG_0176.jpg'/></p>
+<p>I used existing <a rel="nofollow" class="external text" href="/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> tools to study this behavior and then improved Txtzyme to simplify this sort of measurement. I used the <a rel="nofollow" class="external text" href="/blog/wardcunningham/txtzyme_javascope_feeds_javas_2d_graphics">Javascope</a> viewer from an earlier project to capture images of the return pulse that looked like this:</p>
+<p><img alt='img' src='/files/images/Screen%20shot%202010-08-15%20at%203.25.00%20PM.png'/></p>
 <p>I wrote a shell loop that ran this Txtzyme ten times a second to get a nicely animated display in the scope:</p>
 <dl>
 <dd>_ping_ 7d 1o0o 420{ip10u}</dd>
 </dl>
 <p>The non-numeric output (_ping_) resets Javascope, then the 420 times repeat prints that many zeros and ones back to my laptop. This code produces samples at the rate of one every 40 microseconds or so. The interpreter takes about 5 microseconds per instruction and then I tack on 10 microseconds to get the capture rate that looks good in the display.</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/Screen%20shot%202010-08-15%20at%205.31.07%20PM.preview.png'/></p>
+<p><img alt='img' src='/files/images/Screen%20shot%202010-08-15%20at%205.31.07%20PM.preview.png'/></p>
 <p>This output is from a revised Txtzyme program that uses a new, <b>t</b> command for measuring the pulse width. Here I was pointing the sensor at the ceiling, wiggled it around a little bit, then waved my hand in front of the sensor twice.</p>
 <p>I use perl to send 300 <b>t</b> commands to Txtzyme, again sampling at 10 times a second:</p>
 <dl>

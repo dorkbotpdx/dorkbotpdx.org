@@ -2,9 +2,9 @@ Standalone (Txtzyme) Sparkles
 2011-07-10 16:27:22
 paul
 
-At the Open Source Bridge hacker lounge, Ward Cunningham was talking about borrowing a Mac Mini to run his <a href="http://www.dorkbotpdx.org/blog/wardcunningham/txtzyme_sparkles_on_led_matrix">Txtzyme Sparkles</a> at an art show.
+At the Open Source Bridge hacker lounge, Ward Cunningham was talking about borrowing a Mac Mini to run his <a href="/blog/wardcunningham/txtzyme_sparkles_on_led_matrix">Txtzyme Sparkles</a> at an art show.
 
-<img src="http://dorkbotpdx.org/files/images/txtzyme_sparkle.jpg">
+<img src="/files/images/txtzyme_sparkle.jpg">
 
 Rather than go home at a reasonable hour, I thought it'd be fun to try implementing all the math directly on the Teensy++, using only the Arduino IDE.  Making it run was easy, but doing the math as fast as the computer+USB was quite a challenge.
 
@@ -140,25 +140,25 @@ With all the optimizations in place, Ward and I spent a little time (as midnight
 &nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">unsigned</span> <span style="color: #CC6600;">int</span> rindex=0;
 &nbsp;&nbsp;<span style="color: #CC6600;">if</span> (x &gt;= 0 &amp;&amp; x &lt;= 7 &amp;&amp; y &gt;= 0 &amp;&amp; y &lt;= 7) {
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(x) {
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF |= (1&lt;&lt;4); DDRF |= (1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTC |= (1&lt;&lt;5); DDRC |= (1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC |= (1&lt;&lt;4); DDRC |= (1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF |= (1&lt;&lt;1); DDRF |= (1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC |= (1&lt;&lt;2); DDRC |= (1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTF |= (1&lt;&lt;2); DDRF |= (1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTF |= (1&lt;&lt;6); DDRF |= (1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF |= (1&lt;&lt;4); DDRF |= (1&lt;&lt;4); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTC |= (1&lt;&lt;5); DDRC |= (1&lt;&lt;5); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC |= (1&lt;&lt;4); DDRC |= (1&lt;&lt;4); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF |= (1&lt;&lt;1); DDRF |= (1&lt;&lt;1); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC |= (1&lt;&lt;2); DDRC |= (1&lt;&lt;2); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTF |= (1&lt;&lt;2); DDRF |= (1&lt;&lt;2); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTF |= (1&lt;&lt;6); DDRF |= (1&lt;&lt;6); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTF |= (1&lt;&lt;7); DDRF |= (1&lt;&lt;7); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//digitalWrite(anode[x], HIGH);</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//pinMode(anode[x], OUTPUT);</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(y) {
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;0); DDRF |= (1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTF &amp;= ~(1&lt;&lt;5); DDRF |= (1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;0); DDRC |= (1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;3); DDRF |= (1&lt;&lt;3); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;7); DDRC |= (1&lt;&lt;7); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTC &amp;= ~(1&lt;&lt;1); DDRC |= (1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTC &amp;= ~(1&lt;&lt;6); DDRC |= (1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;0); DDRF |= (1&lt;&lt;0); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTF &amp;= ~(1&lt;&lt;5); DDRF |= (1&lt;&lt;5); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;0); DDRC |= (1&lt;&lt;0); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;3); DDRF |= (1&lt;&lt;3); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;7); DDRC |= (1&lt;&lt;7); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTC &amp;= ~(1&lt;&lt;1); DDRC |= (1&lt;&lt;1); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTC &amp;= ~(1&lt;&lt;6); DDRC |= (1&lt;&lt;6); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTC &amp;= ~(1&lt;&lt;3); DDRC |= (1&lt;&lt;3); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//digitalWrite(cathode[y], LOW);</span>
@@ -167,24 +167,24 @@ With all the optimizations in place, Ward and I spent a little time (as midnight
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> xold = x;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">char</span> yold = y;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(xold) {
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;4); DDRF &amp;= ~(1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTC &amp;= ~(1&lt;&lt;5); DDRC &amp;= ~(1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;4); DDRC &amp;= ~(1&lt;&lt;4); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;1); DDRF &amp;= ~(1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;2); DDRC &amp;= ~(1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTF &amp;= ~(1&lt;&lt;2); DDRF &amp;= ~(1&lt;&lt;2); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTF &amp;= ~(1&lt;&lt;6); DDRF &amp;= ~(1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;4); DDRF &amp;= ~(1&lt;&lt;4); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTC &amp;= ~(1&lt;&lt;5); DDRC &amp;= ~(1&lt;&lt;5); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;4); DDRC &amp;= ~(1&lt;&lt;4); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;1); DDRF &amp;= ~(1&lt;&lt;1); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;2); DDRC &amp;= ~(1&lt;&lt;2); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTF &amp;= ~(1&lt;&lt;2); DDRF &amp;= ~(1&lt;&lt;2); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTF &amp;= ~(1&lt;&lt;6); DDRF &amp;= ~(1&lt;&lt;6); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTF &amp;= ~(1&lt;&lt;7); DDRF &amp;= ~(1&lt;&lt;7); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//pinMode(anode[xold], INPUT);</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">switch</span>(yold) {
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;0); DDRF &amp;= ~(1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTF &amp;= ~(1&lt;&lt;5); DDRF &amp;= ~(1&lt;&lt;5); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;0); DDRC &amp;= ~(1&lt;&lt;0); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;3); DDRF &amp;= ~(1&lt;&lt;3); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;7); DDRC &amp;= ~(1&lt;&lt;7); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTC &amp;= ~(1&lt;&lt;1); DDRC &amp;= ~(1&lt;&lt;1); <span style="color: #CC6600;">break</span>; 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTC &amp;= ~(1&lt;&lt;6); DDRC &amp;= ~(1&lt;&lt;6); <span style="color: #CC6600;">break</span>; 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 0: PORTF &amp;= ~(1&lt;&lt;0); DDRF &amp;= ~(1&lt;&lt;0); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 1: PORTF &amp;= ~(1&lt;&lt;5); DDRF &amp;= ~(1&lt;&lt;5); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 2: PORTC &amp;= ~(1&lt;&lt;0); DDRC &amp;= ~(1&lt;&lt;0); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 3: PORTF &amp;= ~(1&lt;&lt;3); DDRF &amp;= ~(1&lt;&lt;3); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 4: PORTC &amp;= ~(1&lt;&lt;7); DDRC &amp;= ~(1&lt;&lt;7); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 5: PORTC &amp;= ~(1&lt;&lt;1); DDRC &amp;= ~(1&lt;&lt;1); <span style="color: #CC6600;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 6: PORTC &amp;= ~(1&lt;&lt;6); DDRC &amp;= ~(1&lt;&lt;6); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">case</span> 7: PORTC &amp;= ~(1&lt;&lt;3); DDRC &amp;= ~(1&lt;&lt;3); <span style="color: #CC6600;">break</span>;
 &nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7E7E7E;">//pinMode(cathode[yold], INPUT);</span>

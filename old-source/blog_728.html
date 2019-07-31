@@ -11,7 +11,7 @@ Sadly, the Sparkfun El Wire Sequencer board has been nothing but trouble.  Mykle
 
 First of all, some of these problems may be less severe, or perhaps not even issues at all, in less demanding applications.  We're connecting 8 feet of El Wire to each channel.  However, the el wire we're using is a higher brightness type.  I measured approx 44 nF.  I saw a "rule of thumb" on Coolneon's site that el wire is about 1 nF per foot.  So perhaps we're really connecting the electrical equivalent of 44 feet of el wire to each output?
 
-All these issues are related to "v14", which is <a href="http://www.dorkbotpdx.org/files/sequencer-v14.pdf">this schematic</a>.  Perhaps someday Sparkfun will improve this board, so if you're reading this long after summer of 2011, please compare versions and schematics carefully.
+All these issues are related to "v14", which is <a href="/files/sequencer-v14.pdf">this schematic</a>.  Perhaps someday Sparkfun will improve this board, so if you're reading this long after summer of 2011, please compare versions and schematics carefully.
 
 The first easy issue is there's no common ground connection between the AVR chip's ground, called "GND" on the schematic, and the triac ground, called "HCGND" on the schematic.  At first, I connected them by soldering a wire between pads on the board.  There's no obvious place on the board to make such a connection, and no documention from Sparkfun that it's necessary.
 

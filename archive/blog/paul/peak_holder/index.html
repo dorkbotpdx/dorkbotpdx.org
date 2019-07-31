@@ -1,1 +1,19 @@
-A simple peak holder circuit, for interfacing piezoelectric transducers to AVR analog inputs.  (thanks to Laen's PCB group order!)<a href="http://dorkbotpdx.org/files/images/peak_holder_proto_big.jpg"><img src="http://dorkbotpdx.org/files/images/peak_holder_proto.jpg"></a>The analog circuit amplifies the signal (gain of 2), and the output capacitor holds it.  The AVR should discharge the cap after reading a peak, by momentarily turning the pin to digital output.<img src="http://dorkbotpdx.org/files/images/peak_holder_sch.png">This thing is intended for testing the USB MIDI support I'm adding to Teensyduino.Edit: After more testing, it turns out the LM324 can work perfectly fine without the -5 volt supply.  I was initially concerned it may not work very well near zero volts and be able to charge the 0.1 uF capacitors.  But the forward drop on the 1N4148 diodes means the LM324 is actually working at about 0.7 volts when delivering those tiny outputs to the caps.  I did quite a bit of extra testing with small signals, and it works great.  So the LMC7660 chip can be left off, and pin 5 (the -5 volt output) just shorted to ground.  It's best to attach the wire from pin 5 directly to the ground pin on the connector (as opposed to nearby resistors), but even that's probably more analog paranoia on my part.Update: I'm working on an Arduino library which makes using this circuit much easier, and provides highly consistent and reliable timing.  If you've built this or intend to, please contact me directly for the code, paul at pjrc dot com.  
+<head>
+  <title>Peak holder</title>
+  <link rel="stylesheet" href="/css/archive.css">
+</head>
+
+<body>
+  <div id="db-header"></div>
+  <h1 class="db-page-header">Peak holder</h1>
+  <h2 class="db-page-header">By: paul</h2>
+  <h3 class="db-page-header">2010-12-06 14:17:35</h3>
+
+  <div id="db-content">
+    A simple peak holder circuit, for interfacing piezoelectric transducers to AVR analog inputs.  (thanks to Laen's PCB group order!)<a href="/files/images/peak_holder_proto_big.jpg"><img src="/files/images/peak_holder_proto.jpg"></a>The analog circuit amplifies the signal (gain of 2), and the output capacitor holds it.  The AVR should discharge the cap after reading a peak, by momentarily turning the pin to digital output.<img src="/files/images/peak_holder_sch.png">This thing is intended for testing the USB MIDI support I'm adding to Teensyduino.Edit: After more testing, it turns out the LM324 can work perfectly fine without the -5 volt supply.  I was initially concerned it may not work very well near zero volts and be able to charge the 0.1 uF capacitors.  But the forward drop on the 1N4148 diodes means the LM324 is actually working at about 0.7 volts when delivering those tiny outputs to the caps.  I did quite a bit of extra testing with small signals, and it works great.  So the LMC7660 chip can be left off, and pin 5 (the -5 volt output) just shorted to ground.  It's best to attach the wire from pin 5 directly to the ground pin on the connector (as opposed to nearby resistors), but even that's probably more analog paranoia on my part.Update: I'm working on an Arduino library which makes using this circuit much easier, and provides highly consistent and reliable timing.  If you've built this or intend to, please contact me directly for the code, paul at pjrc dot com.
+  </div>
+
+  <div id="db-back-to-index">
+    <a href="/archive/index.html">Back to archive index</a>
+  </div>
+</body>

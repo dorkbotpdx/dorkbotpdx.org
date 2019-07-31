@@ -2,17 +2,17 @@ Benito with i2c and USB midi
 2008-10-17 15:58:42
 ax
 
-I grabbed two of those 36 key keypad boards from Paul at the last dork bot, he grabbed them out of those POS boxes [with the big LCDs that he has posted info about].  I wanted to get them working with the <a href="http://dorkbotpdx.org/wiki/benito">Benito</a> and also wanted work with i2c a little [as I have a bunch of these 8bit i2c i/o expanders].  The keypad has 20 i/o pins so the Benito cannot use it directly anyways.. though 12 bits of shift registering would probably be better... but either way, I wanted to use what I had + i2c.
+I grabbed two of those 36 key keypad boards from Paul at the last dork bot, he grabbed them out of those POS boxes [with the big LCDs that he has posted info about].  I wanted to get them working with the <a href="/wiki/benito">Benito</a> and also wanted work with i2c a little [as I have a bunch of these 8bit i2c i/o expanders].  The keypad has 20 i/o pins so the Benito cannot use it directly anyways.. though 12 bits of shift registering would probably be better... but either way, I wanted to use what I had + i2c.
 
 If you didn't know, the Bentio doesn't have hardware supported i2c, so I used Peter Fleury's <a href="http://homepage.hispeed.ch/peterfleury/avr-software.html">i2cmaster</a> code [slightly modified to have 100khz i2c with the bentio's 8Mhz clock] which does i2c in software [assembly].  My modified code is in the tar file below, all I had to do was modify a delay routine so that the timing would be correct with this clock and for 100khz i2c (if you're doing 400khz i2c on the benito there is no need to change this code).
 
 Here is a photo of the setup:
 
-http://dorkbotpdx.org/files/images/benito-i2c-midi-buttons.jpg
+/files/images/benito-i2c-midi-buttons.jpg
 
 Here is a screen grab of #dorkbotpdx and amidi printing out info from this USB midi device (not ALL that exciting):
 
-http://dorkbotpdx.org/files/images/benito-i2c-midi-buttons-screengrab.png
+/files/images/benito-i2c-midi-buttons-screengrab.png
 
 Here is a link to the code:
 

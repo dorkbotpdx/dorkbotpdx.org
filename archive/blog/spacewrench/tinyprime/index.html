@@ -1,1 +1,19 @@
-<p>I'd been meaning to do this for a while, and when I got a bag of colorful little breadboards, it was <b><small>TIME</small></b>.</p><p><img src="http://dorkbotpdx.org/files/images/TinyPrime.preview.jpg"></p><p>This is a rebuild of the <a href="http://dorkbotpdx.org/blog/spacewrench/prime_numbers_the_hard_way">TeensyPrime project</a> I built a while ago, using a separate breadboard that's <i>almost</i> too small (I had to use magnet wire to fit some of the connections) and a microcontroller that's <i>almost</i> too small. The ATTiny13A is a neat chip: AVR with 1K of flash, 64 bytes of RAM and 64 bytes of EEPROM. I programmed it using a Teensy-2.0-based waldo running Ward Cunningham's <code>TXTZYME</code>.</p><p><iframe allowfullscreen="" frameborder="0" height="315" src="//www.youtube.com/embed/LkTUVTVly40" width="420"></iframe></p><p>The programming for this is actually kind of interesting.&nbsp; Every time you push the button, the AVR retrieves the currently-displayed number&nbsp; (which is stored in EEPROM), and then increments it, clicks the counter, and tests for primality.&nbsp; If the number isn't prime, it increments and clicks again.&nbsp; When a prime number is reached, it stops and waits for another button press.&nbsp; But how do you (relatively) efficiently test for primality of numbers when you only have 1K of Flash?&nbsp; (Hint: it's related to the fact that you only need to be able to do it for numbers up to 999,999, since the counter is only 6 digits long.)&nbsp; (<i>note to self:</i> better figure out whether the program handles rollover at 999,999.&nbsp; It probably doesn't right now, but it would be easy enough to add.)</p>
+<head>
+  <title>TinyPrime</title>
+  <link rel="stylesheet" href="/css/archive.css">
+</head>
+
+<body>
+  <div id="db-header"></div>
+  <h1 class="db-page-header">TinyPrime</h1>
+  <h2 class="db-page-header">By: spacewrench</h2>
+  <h3 class="db-page-header">2014-06-01 09:13:20</h3>
+
+  <div id="db-content">
+    <p>I'd been meaning to do this for a while, and when I got a bag of colorful little breadboards, it was <b><small>TIME</small></b>.</p><p><img src="/files/images/TinyPrime.preview.jpg"></p><p>This is a rebuild of the <a href="/blog/spacewrench/prime_numbers_the_hard_way">TeensyPrime project</a> I built a while ago, using a separate breadboard that's <i>almost</i> too small (I had to use magnet wire to fit some of the connections) and a microcontroller that's <i>almost</i> too small. The ATTiny13A is a neat chip: AVR with 1K of flash, 64 bytes of RAM and 64 bytes of EEPROM. I programmed it using a Teensy-2.0-based waldo running Ward Cunningham's <code>TXTZYME</code>.</p><p><iframe allowfullscreen="" frameborder="0" height="315" src="//www.youtube.com/embed/LkTUVTVly40" width="420"></iframe></p><p>The programming for this is actually kind of interesting.&nbsp; Every time you push the button, the AVR retrieves the currently-displayed number&nbsp; (which is stored in EEPROM), and then increments it, clicks the counter, and tests for primality.&nbsp; If the number isn't prime, it increments and clicks again.&nbsp; When a prime number is reached, it stops and waits for another button press.&nbsp; But how do you (relatively) efficiently test for primality of numbers when you only have 1K of Flash?&nbsp; (Hint: it's related to the fact that you only need to be able to do it for numbers up to 999,999, since the counter is only 6 digits long.)&nbsp; (<i>note to self:</i> better figure out whether the program handles rollover at 999,999.&nbsp; It probably doesn't right now, but it would be easy enough to add.)</p>
+  </div>
+
+  <div id="db-back-to-index">
+    <a href="/archive/index.html">Back to archive index</a>
+  </div>
+</body>

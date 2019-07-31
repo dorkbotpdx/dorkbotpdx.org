@@ -2,12 +2,12 @@ ARM LCD Development Board
 2012-05-27 21:13:28
 scott_d
 
-This is a ARM LPC1343 development board with a nice 132x162 16 bit color TFT LCD display, a microSD card, USB and LiPo recharging.  I used it as a name badge at the San Mateo Maker Faire this year.  
+This is a ARM LPC1343 development board with a nice 132x162 16 bit color TFT LCD display, a microSD card, USB and LiPo recharging.  I used it as a name badge at the San Mateo Maker Faire this year.
 <!--break-->
 It started life with a couple of designs from Rossum's <a href="http://rossum.posterous.com/">blog</a>:
 The first was a <a href="http://rossum.posterous.com/screen-play-lots-of-other-screens-for-microco">post</a> on the LCD display from Nokia 6101 cell phones which is available for about $3.00 delivered from Ebay.  The only problem with it was the difficulty in finding the 22 pin Hirose connector.  But now Will has it on his webstore (http://store.fungizmos.com/items/426).
 The other <a href="http://rossum.posterous.com/a-smarter-display">project</a> was an ARM based LCD board.  I liked the ARM board but couldn't find a source for the LCD he used for that project.  And I sort of liked the 6101 LCD in any case.  So I did a version of the ARM board converted to use the 6101 display.  Rossum was kind enough to send along some of the connectors which he had gotten from a vendor in China.
 The current version of my ARM dev board has changed a lot from Rossum's original design.  I modified it to use the 6101 display, changed around the power handling circuitry quite a bit, including laying it out according to the datasheet to heatsink the LiPo charging chip, increased the board size to accommodate mounting holes, changed the switches used, modified the output header to include more signals and did a completely new board layout.  However, some aspects of Rossum's original design remain, including the boost circuit for the LCD backlight and the overall idea behind the board.
 I also decided to use the excellent LPC1343 library from microbuilder.eu (http://www.microbuilder.eu/Projects/LPC1343ReferenceDesign/LPC1343CodeBase.aspx).  I added a driver for the 6101 LCD (based on the SPFD54124B controller) and adapted the board support for the signal and board layout for my design.
-<img src="http://dorkbotpdx.org/files/images/Photo%20May%2026,%207%2042%2039%20PM%20400px.jpg" />
+<img src="/files/images/Photo%20May%2026,%207%2042%2039%20PM%20400px.jpg" />
 There is one issue with the current board.  The polarity of the battery connector is reversed compared to what is normally found on LiPo batteries from (for example) SparkFun and Adafruit.  This was caused by an error in the Adafruit Eagle library footprint for this connector.  Since this could cause some serious problems, I am going to do one more revision of this board before releasing the Eagle files and code.  Stay tuned if you are interested in the design.

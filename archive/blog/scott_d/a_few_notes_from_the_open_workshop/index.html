@@ -1,1 +1,19 @@
-<p>It was a good turnout for the open workshop at PNCA on Sunday. Don and Monty both got their hot plate systems up and running and soldered some boards. A couple of others started to put together their temperature controller boards and some questions came up about things I may not have made clear enough before:</p><ul><li>The output signal labeled RESET is currently programmed to return the controller to the initial conditions if you ground it. This is intended to be a quick way to reset the temperature once the reflow process is completed.</li></ul><ul><li>If you don't use the thermocouple interface chip, then you also don't need the bypass capacitor C4.</li></ul><ul><li>C3 on the bottom of the board is used to set up the AVR reset signal for auto reset during boot loader based programming. If you use a Benito or other MCU based serial programmer, then you should solder bridge or jumper the C3 pads. If you use a plain USB to serial cable (like an FTDI based cable) then you need to solder on a .1uF capacitor for C3. The pads will accommodate either an 0603 or 0805 sized cap.</li></ul>
+<head>
+  <title>A Few Notes from the Open Workshop</title>
+  <link rel="stylesheet" href="/css/archive.css">
+</head>
+
+<body>
+  <div id="db-header"></div>
+  <h1 class="db-page-header">A Few Notes from the Open Workshop</h1>
+  <h2 class="db-page-header">By: scott_d</h2>
+  <h3 class="db-page-header">2010-03-29 23:29:04</h3>
+
+  <div id="db-content">
+    <p>It was a good turnout for the open workshop at PNCA on Sunday. Don and Monty both got their hot plate systems up and running and soldered some boards. A couple of others started to put together their temperature controller boards and some questions came up about things I may not have made clear enough before:</p><ul><li>The output signal labeled RESET is currently programmed to return the controller to the initial conditions if you ground it. This is intended to be a quick way to reset the temperature once the reflow process is completed.</li></ul><ul><li>If you don't use the thermocouple interface chip, then you also don't need the bypass capacitor C4.</li></ul><ul><li>C3 on the bottom of the board is used to set up the AVR reset signal for auto reset during boot loader based programming. If you use a Benito or other MCU based serial programmer, then you should solder bridge or jumper the C3 pads. If you use a plain USB to serial cable (like an FTDI based cable) then you need to solder on a .1uF capacitor for C3. The pads will accommodate either an 0603 or 0805 sized cap.</li></ul>
+  </div>
+
+  <div id="db-back-to-index">
+    <a href="/archive/index.html">Back to archive index</a>
+  </div>
+</body>

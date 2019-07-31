@@ -4,7 +4,7 @@ paul
 
 I recently got around to making a color fading el wire driver, which actually tries to shift the color by changing the AC frequency.
 
-<img src="http://www.dorkbotpdx.org/files/images/elwire_img.jpg">
+<img src="/files/images/elwire_img.jpg">
 
 "Read more" for technical details....
 
@@ -18,7 +18,7 @@ Here is a little video I tried to make.  I think I spent more time trying to edi
 
 This is the schematic.  Most of the parts are small surface mount and they're hidden under the transformer.
 
-<img src="http://www.dorkbotpdx.org/files/images/elwire_sch.png">
+<img src="/files/images/elwire_sch.png">
 
 Here's the code from the Arduino IDE.  Pretty simple stuff.  But beware, if you try this, it's essential to drive each transistor for the same length of time, and not more than about 1ms.  If you drive one more than the other, or leave either on too long, the transform sees a DC or low frequency signal.  That could result in far too much current, probably destroying the transistors if the battery is fresh.
 
@@ -50,7 +50,7 @@ Here's the code from the Arduino IDE.  Pretty simple stuff.  But beware, if you 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (us &gt;= usMax) dir = 0;
 &nbsp;&nbsp;}&nbsp;<span style="color: #CC6600;">else</span> {
 &nbsp;&nbsp;&nbsp;&nbsp;us&nbsp;=&nbsp;us&nbsp;-&nbsp;1&nbsp;-&nbsp;us&nbsp;/&nbsp;2048;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (us &lt;= usMin) dir = 1; 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (us &lt;= usMin) dir = 1;
 &nbsp;&nbsp;}
 &nbsp;&nbsp;<span style="color: #CC6600;">digitalWrite</span>(pin2, <span style="color: #006699;">HIGH</span>);
 &nbsp;&nbsp;<span style="color: #CC6600;">delayMicroseconds</span>(us / 32);

@@ -3,7 +3,7 @@ Building the Bus Pirate at home
 SiliconFarmer
 
 <p>I delivered some Bus Pirate kits at the last DorkbotPDX meeting and I'm about to ship the kits to those that mail-ordered them. So I figured you might find some instructions helpful.</p>
-<p>I created the [<a rel="nofollow" class="external text" href="http://www.dorkbotpdx.org/files/Bus">Pirate v4cD build sheet v4.pdf | build sheet</a>] as a quick reference to where the parts go on the board. Parts are listed in the same order they were taped to the parts list. The order of the parts is generally from the middle of the board outward - the order I like to do assembly. Parts that need to be oriented a specific direction are noted with "polarity" or other text describing how they should be oriented.</p>
+<p>I created the [<a rel="nofollow" class="external text" href="/files/Bus">Pirate v4cD build sheet v4.pdf | build sheet</a>] as a quick reference to where the parts go on the board. Parts are listed in the same order they were taped to the parts list. The order of the parts is generally from the middle of the board outward - the order I like to do assembly. Parts that need to be oriented a specific direction are noted with "polarity" or other text describing how they should be oriented.</p>
 <p>The through hole parts aren't shown on that page. Hopefully its obvious where they go. The notch on the 2x7 shrouded header, "SV1", goes to the right, nearest the right edge of the board.</p>
 <p>You might notice some color I put on the "tape" that the SMD parts come it. That color code is also noted on the parts list they are taped to. Hopefully, you will carefully work through the parts in order and it wont matter, but if there is any doubt about which is which, check the color code on the tape.</p>
 <p>Once you've soldered all the parts, check visually for shorts, then double check for power to ground shorts.</p>
@@ -23,7 +23,7 @@ SiliconFarmer
 <p>You can use a PicKit 2 or 3 to program the boot loader via the ISCP pins. Jim Larson has worked out a pretty cool way to do it using a Teensy board (bug him to document that!).</p>
 <p>You program the firmware using [<a rel="nofollow" class="external text" href="http://dangerousprototypes.com/docs/Pirate-Loader_console_upgrade_application_%28Linux,_Mac,_Windows%29">| these instructions</a>].</p>
 <p>The [<a rel="nofollow" class="external text" href="http://dangerousprototypes.com/2009/07/28/bus-pirate-self-test-guide/">| self test is described here</a>]. Basically, remove the jumper on the ICSP connector and place it on the +3V3 to ADC pins on the 14-pin connector. Connecting the +5V to Vpu is NOT needed for the Bus Pirate 4 self test. Plug the Bus Pirate back into USB and run a terminal program. If it connects successfully, you should see the Bus Pirate prompt (you may have to hit return once): @HiZ&gt;@ type a tilde ~ and press enter to start the self test. Press any key to run the test.</p>
-<p>If you have any problems, I've attached [<a rel="nofollow" class="external text" href="http://www.dorkbotpdx.org/files/DorkbotBusPirate4c.pdf">| the Bus Pirate schematic</a>]. The only difference from Dangerous Prototypes is the 14-pin connector instead of the (hard to find) 12-pin connector for SV1.</p>
+<p>If you have any problems, I've attached [<a rel="nofollow" class="external text" href="/files/DorkbotBusPirate4c.pdf">| the Bus Pirate schematic</a>]. The only difference from Dangerous Prototypes is the 14-pin connector instead of the (hard to find) 12-pin connector for SV1.</p>
 <p>Good luck!</p>
 <p><br /></p>
 <p><br /></p>

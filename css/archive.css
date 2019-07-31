@@ -1,0 +1,28 @@
+@import url('/fonts/inter-ui.css');
+body {
+  font-family: 'Inter UI', sans-serif;
+  color: #FFFFFF;
+  background-color: #000000;
+  word-wrap: break-word;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.db-header {
+  content: url("/img/dorkbot-logo-horizontal.png")
+}
+
+.db-page-header {
+  background-color: #aaaaaa;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+g-col {
+  vertical-align: top;
+}
+
+a {
+ color: #FFFFFF;
+ text-decoration: underline;
+}

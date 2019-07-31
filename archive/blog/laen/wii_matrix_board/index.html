@@ -1,1 +1,19 @@
-For <a href="http://www.dorkbotpdx.org/">dorkbotpdx</a> last night, I made this little toy:<a href="http://www.flickr.com/photos/laen/2490373487/" title="WiiMatrix by Laen, on Flickr"><img src="http://farm3.static.flickr.com/2208/2490373487_a626bae118.jpg" width="500" height="333" alt="WiiMatrix" /></a>It's an 8x8 red+green LED Matrix, driven by two shift registers and a Bare Bones Board Freeduino by <a href="http://moderndevice.com/">Modern Device Company</a>.Before the meeting I just had it flashing fun patterns based on odd bit-math equations.  During the meeting, I was urged to add some code to make it controllable by the Wii Nunchuk.  So, I wrote a simple program that takes the X and Y of accelerometer and plots it on the matrix.I drove the LED Matrix with three shift registers: One 74HC595 8-bit register gave power to the rows of the display, and one Maxim-IC MAX6969 sank current for the columns to the display.  To turn on row 1, column one, you shift "B10000000" into the row register, and "B10000000" into the column register:<code>B 1 0 0 0 0 0 0 0  1 x o o o o o o o0 o o o o o o o o0 o o o o o o o o 0 o o o o o o o o 0 o o o o o o o o 0 o o o o o o o o 0 o o o o o o o o 0 o o o o o o o o </code>Altogether, it was about 30 lines of code to drive the matrix with some fun patterns.<small><em>Also seen at:<a href="http://www.laen.org/2008/05/13/the-wii-matrix-board/">my blog</a></em></small>
+<head>
+  <title>Wii Matrix Board</title>
+  <link rel="stylesheet" href="/css/archive.css">
+</head>
+
+<body>
+  <div id="db-header"></div>
+  <h1 class="db-page-header">Wii Matrix Board</h1>
+  <h2 class="db-page-header">By: Laen</h2>
+  <h3 class="db-page-header">2008-05-13 18:21:41</h3>
+
+  <div id="db-content">
+    For <a href="/">dorkbotpdx</a> last night, I made this little toy:<a href="http://www.flickr.com/photos/laen/2490373487/" title="WiiMatrix by Laen, on Flickr"><img src="http://farm3.static.flickr.com/2208/2490373487_a626bae118.jpg" width="500" height="333" alt="WiiMatrix" /></a>It's an 8x8 red+green LED Matrix, driven by two shift registers and a Bare Bones Board Freeduino by <a href="http://moderndevice.com/">Modern Device Company</a>.Before the meeting I just had it flashing fun patterns based on odd bit-math equations.  During the meeting, I was urged to add some code to make it controllable by the Wii Nunchuk.  So, I wrote a simple program that takes the X and Y of accelerometer and plots it on the matrix.I drove the LED Matrix with three shift registers: One 74HC595 8-bit register gave power to the rows of the display, and one Maxim-IC MAX6969 sank current for the columns to the display.  To turn on row 1, column one, you shift "B10000000" into the row register, and "B10000000" into the column register:<code>B 1 0 0 0 0 0 0 01 x o o o o o o o0 o o o o o o o o0 o o o o o o o o0 o o o o o o o o0 o o o o o o o o0 o o o o o o o o0 o o o o o o o o0 o o o o o o o o</code>Altogether, it was about 30 lines of code to drive the matrix with some fun patterns.<small><em>Also seen at:<a href="http://www.laen.org/2008/05/13/the-wii-matrix-board/">my blog</a></em></small>
+  </div>
+
+  <div id="db-back-to-index">
+    <a href="/archive/index.html">Back to archive index</a>
+  </div>
+</body>

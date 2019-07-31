@@ -4,11 +4,11 @@ paul
 
 In January, Mykle called for RGB LED lighting help for <a href="http://mykle.com/msl/?p=330">Lightbar</a>.  On a whim, I made this little board:
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_main.jpg">
+<img src="/files/images/ltbar_main.jpg">
 
 It's incredibly bright.  Here it's set to color #FF20FF (pink):
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_on.jpg">
+<img src="/files/images/ltbar_on.jpg">
 
 Mykle wrote more <a href="http://mykle.com/msl/?p=363">about the lights and using them at Lightbar</a>.  This blog entry is mostly about the technical details and design files.  Read on for details...
 <!--break-->
@@ -41,11 +41,11 @@ and/or, does anybody in Dorkbot feel like taking this on as their own project?  
 
 So, I started looking at some RGB LED specs.  I pretty quickly found that the lower power LEDs, like the one on BlinkM, aren't specified in Lumens (total light output), or if they are, the Lumens per Watt aren't great.
 
-After comparing lots of LEDs, I finally ended up with <a href="http://www.dorkbotpdx.org/files/ASMT-MT00.pdf">ASMT-MT00</a>, which is in the 30-some Lumen/Watt range.  It's not cheap (about $10 to $15 in small qty), but it really works!
+After comparing lots of LEDs, I finally ended up with <a href="/files/ASMT-MT00.pdf">ASMT-MT00</a>, which is in the 30-some Lumen/Watt range.  It's not cheap (about $10 to $15 in small qty), but it really works!
 
 Here's a close-up of the LED.
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_led.jpg">
+<img src="/files/images/ltbar_led.jpg">
 
 Mykle wanted to keep the cost low.  In fact, he wanted to use cheaper LEDs... But this was my little weekend project-on-a-whim, and I wanted 100+ lumens!  I also really wanted to make it run on 12 volts and have very efficient conversion and tolerate some voltage drop without changing the LED brightness, and I wanted RS485 communication so the signals can run a long distance (unlike BlinkM).  This design does all that.  In the end, it worked really well for Lightbar... so well that Mykle is building 18 more boards!
 
@@ -55,7 +55,7 @@ IC manufacturers generally recommend using 3 of their LED drivers for RGB LEDs, 
 
 The basic idea was run all 3 LEDs in series.  The ASMT-MT00 nicely provides each LED separately on 6 pins, instead of common anode or common cathode, which makes this possible.
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_sch.gif">
+<img src="/files/images/ltbar_sch.gif">
 
 The LM3407 can operate without any output capacitor.  It is a constant current afterall.  Normally a 22 uH inductor would be recommended.  But I decided to increase it to 100 uH (the datasheet is light on details of stability in continuous vs discontinuous mode, but it seemed like continuous conduction buck mode would work).  The LM3407 datasheet mentions being able to omit the output cap, with increased variance in output.  Since I wasn't going to have any output cap, I wanted the current to be better regulated, and upsizing the inductance is the way to do it.
 
@@ -63,11 +63,11 @@ The reason to omit the output capacitor is because I decided to change the color
 
 Since the PNP transistors basically "float" at whatever voltage the power supply and drop on other LEDs or transistors happen to make, I used 3904 NPNs so a microcontroller can turn on and off their base current.  When the processor drives 3.3 volts, about 2.6 volts is driven onto the 220 ohm resistor on the emitter, or about 12 mA in the 220 ohm resistor.  That 12 mA comes mostly through the collector (which doesn't care what it's voltage happens to be when used in linear mode), which pulls the current from the floating PNP transistor base.
 
-Yes, this is a pretty unusual transistor circuit... and I wasn't completely sure if it'd work, but this whole thing was just a whim.  I spend 2 days on it, the first one reading about the LEDs, LM3407 (and lots of other chips), and thinking about that circuit.  The second day, I drew up the circuit board.  I knew the LED gets hot, and so would the LM3407 and maybe the transistors too?  I just drew some copper planes and thermal vias, and a big pad for a small heatsink (leftover from another old project).  No prototype, no simulation, no real analysis... just a lot of guesswork and hunches, and at the end of the second day I sent off the files to <a href="http://dorkbotpdx.org/wiki/pcb_order">Laen's PCB Order</a>.
+Yes, this is a pretty unusual transistor circuit... and I wasn't completely sure if it'd work, but this whole thing was just a whim.  I spend 2 days on it, the first one reading about the LEDs, LM3407 (and lots of other chips), and thinking about that circuit.  The second day, I drew up the circuit board.  I knew the LED gets hot, and so would the LM3407 and maybe the transistors too?  I just drew some copper planes and thermal vias, and a big pad for a small heatsink (leftover from another old project).  No prototype, no simulation, no real analysis... just a lot of guesswork and hunches, and at the end of the second day I sent off the files to <a href="/wiki/pcb_order">Laen's PCB Order</a>.
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_pcb.jpg">
+<img src="/files/images/ltbar_pcb.jpg">
 
-<a href="http://www.dorkbotpdx.org/files/ltbar_pcb.zip">Here are the PCB files</a>.
+<a href="/files/ltbar_pcb.zip">Here are the PCB files</a>.
 
 I never drew any schematic for the rest, but it's just a ATTINY2313 chip to control everything.  There's 4 PWM signals, 3 connected to the transistors, and the 4th to the "DIM" control pin on the LM3407, so it can shut off when none of the LEDs need to be on.  There's also a RS485 interface chip and a few other necessary parts, but nothing really special.
 
@@ -103,7 +103,7 @@ qty  part number        part description                        sources
 
 If anyone actually builds more boards (Mykle is building 18 more), here's a parts placement diagram:
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_placement.jpg">
+<img src="/files/images/ltbar_placement.jpg">
 
 I pretty much set this thing aside and forgot about it, until the boards arrived a few weeks later.  I set them aside for a few days, but the Dorkbot Monday meetup was the motivation I needed to get them actually working!
 
@@ -115,9 +115,9 @@ About mid-morning Monday, with the Dorkbot meetup looming only hours away, but t
 
 One confession I need to make is the ISP header was routed for the usual pinout with the header on the "top" side, but I soldered it to the "bottom" side (the side with the heatsink).  Fortunately, I had a <a href="http://www.pjrc.com/teensy/">Teensy</a> with ArduinoISP sitting on my desk, so it was pretty easy to just reverse the pinout to match.  But if anyone else builds this little board and tries to use an off-the-shelf AVR ISP programmer, well, either solder the header to the LED side, or plan on wiring up a little adaptor to reverse the pinout.
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_back.jpg">
+<img src="/files/images/ltbar_back.jpg">
 
-In about an hour, I banged out this <a href="http://www.dorkbotpdx.org/files/ltbar_code.tar_.gz">extemely simple code</a> to run on the ATTINY2313 chip.
+In about an hour, I banged out this <a href="/files/ltbar_code.tar_.gz">extemely simple code</a> to run on the ATTINY2313 chip.
 
 It listens for 8 character ASCII commands at 115200 baud.  The input is hex, where the first byte is the board's address, and the next 3 bytes are the RGB color.  Any non-hex byte causes it to discard any data and begin listening for a new comment.  Normally, sending a byte like ":" before a command, or pressing Enter after each command is a good idea.  Here's a few commands:
 
@@ -135,9 +135,9 @@ I spent about 1 hour on the code.  Much of that was making the PWM polarities co
 
 With a few extra hours to spare before Dorkbot that Monday evening, I did some fiddling to make the lights work with Puredata.  All 3 boards I made were working well that night.
 
-<img src="http://www.dorkbotpdx.org/files/images/ltbar_pd.gif">
+<img src="/files/images/ltbar_pd.gif">
 
-I must confess, I'm not very experienced with Puredata.  But quite a Dorkbot regulars are.  Jason, Brian and others hacked on the Pd stuff and made the LEDs blink and fade.  Here's the <a href="http://www.dorkbotpdx.org/files/ltbar_pd.tar_.gz">Puredata Code</a>, both my original attempts, and the end result of hacking on the code during 1 evening at Backspace.
+I must confess, I'm not very experienced with Puredata.  But quite a Dorkbot regulars are.  Jason, Brian and others hacked on the Pd stuff and made the LEDs blink and fade.  Here's the <a href="/files/ltbar_pd.tar_.gz">Puredata Code</a>, both my original attempts, and the end result of hacking on the code during 1 evening at Backspace.
 
 The evening, Mykle took home the 3 boards, and a RS-485 converter I had (left over from other projects).  They were used at Lightbar, and I made it out there one of the evenings.  Good times.
 

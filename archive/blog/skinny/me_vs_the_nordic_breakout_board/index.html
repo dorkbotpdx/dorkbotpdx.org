@@ -1,1 +1,19 @@
-<a href="http://www.flickr.com/photos/14196411@N07/3389015354/"><img src="http://farm4.static.flickr.com/3425/3389015354_be4193e935.jpg?v=0"/></a>I've been attempting to help (or maybe hinder!) <a href="http://dorkbotpdx.org/blog/feurig/">Don</a> with a project he's working on.  My task is to get a <a href="http://dorkbotpdx.org/wiki/dorkboard">Dorkboard</a> and eventually just the <a href="http://dorkbotpdx.org/wiki/benito">Benito</a> talking to this Nordic nRF2401A <a href="http://www.sparkfun.com/commerce/product_info.php?products_id=152">breakout board</a> from <a href="http://www.sparkfun.com/">Sparkfun</a>.  After hacking on it a for a few days and today at the <a href="http://dorkbotpdx.org/blog/breedx/economy_bad_free_workshop_good_0">Open Lab</a> and even more hacking at home I finally have the example program working!  I'm attaching the source for the Arduino sketch for anyone else trying to do the same thing.<!--break-->Other things to note:<ul><li>Link to the <a href="http://dorkbotpdx.org/files/personalcharm0.txt">Code</a>.</li><li>The Nordic board needs 3.3v.  Don is running the Benito and Dorkboard at 3.3v <a href="http://dorkbotpdx.org/blog/feurig/3_ways_to_3_volts">(see here)</a> to make things simple.  </li><li>Pin config (Nordic board (Left to Right), Pin on Dorkboard, Arduino Pin Number for digitalWrite)<ul><li>GND, 22, NA</li><li>DATA, 11, 5</li><li>CLK1, 6, 4</li><li>DR1, 5, 3</li><li>CS, 9, 6</li><li>CE, 13, 7</li><li>VCC, 7, NA</li></ul></ul>DataSheets:  <ul><li><a href="http://www.sparkfun.com/datasheets/IC/nRF2401A.pdf">Nordic RF2401A</a> </li><li><a href="http://www.datasheetcatalog.org/datasheets/228/219592_DS.pdf">ATMega 168v</a></li></ul>Random lesson learned from this project so far:  Think about timing, and remember that doing serial debugging statements will really putz up your timings! ;)
+<head>
+  <title>Me vs. the Nordic Breakout Board</title>
+  <link rel="stylesheet" href="/css/archive.css">
+</head>
+
+<body>
+  <div id="db-header"></div>
+  <h1 class="db-page-header">Me vs. the Nordic Breakout Board</h1>
+  <h2 class="db-page-header">By: skinny</h2>
+  <h3 class="db-page-header">2009-03-29 22:39:28</h3>
+
+  <div id="db-content">
+    <a href="http://www.flickr.com/photos/14196411@N07/3389015354/"><img src="http://farm4.static.flickr.com/3425/3389015354_be4193e935.jpg?v=0"/></a>I've been attempting to help (or maybe hinder!) <a href="/blog/feurig/">Don</a> with a project he's working on.  My task is to get a <a href="/wiki/dorkboard">Dorkboard</a> and eventually just the <a href="/wiki/benito">Benito</a> talking to this Nordic nRF2401A <a href="http://www.sparkfun.com/commerce/product_info.php?products_id=152">breakout board</a> from <a href="http://www.sparkfun.com/">Sparkfun</a>.  After hacking on it a for a few days and today at the <a href="/blog/breedx/economy_bad_free_workshop_good_0">Open Lab</a> and even more hacking at home I finally have the example program working!  I'm attaching the source for the Arduino sketch for anyone else trying to do the same thing.<!--break-->Other things to note:<ul><li>Link to the <a href="/files/personalcharm0.txt">Code</a>.</li><li>The Nordic board needs 3.3v.  Don is running the Benito and Dorkboard at 3.3v <a href="/blog/feurig/3_ways_to_3_volts">(see here)</a> to make things simple.  </li><li>Pin config (Nordic board (Left to Right), Pin on Dorkboard, Arduino Pin Number for digitalWrite)<ul><li>GND, 22, NA</li><li>DATA, 11, 5</li><li>CLK1, 6, 4</li><li>DR1, 5, 3</li><li>CS, 9, 6</li><li>CE, 13, 7</li><li>VCC, 7, NA</li></ul></ul>DataSheets:<ul><li><a href="http://www.sparkfun.com/datasheets/IC/nRF2401A.pdf">Nordic RF2401A</a> </li><li><a href="http://www.datasheetcatalog.org/datasheets/228/219592_DS.pdf">ATMega 168v</a></li></ul>Random lesson learned from this project so far:  Think about timing, and remember that doing serial debugging statements will really putz up your timings! ;)
+  </div>
+
+  <div id="db-back-to-index">
+    <a href="/archive/index.html">Back to archive index</a>
+  </div>
+</body>

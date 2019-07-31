@@ -12,13 +12,13 @@ In my environment, I'm using 64-bit Debian (unstable).
 <h2>Schematic</h2>
 
 Using the <a href='http://www.pjrc.com/teensy/pinout.html'>Teensy 2.0 pinout</a>:
-<a href='http://dorkbotpdx.org/files/teensy_pinout2a.png'><img src='http://dorkbotpdx.org/files/teensy_pinout2a.png' width='500px'/></a>
+<a href='/files/teensy_pinout2a.png'><img src='/files/teensy_pinout2a.png' width='500px'/></a>
 
 and the ATTiny45 pinout reference:
-<a href='http://dorkbotpdx.org/files/ATTiny45-Pinout.png'><img src='http://dorkbotpdx.org/files/ATTiny45-Pinout.png' width='500px'/></a>
+<a href='/files/ATTiny45-Pinout.png'><img src='/files/ATTiny45-Pinout.png' width='500px'/></a>
 
 ...we draw the following simple circuit:
-<a href='http://dorkbotpdx.org/files/teensy_avrisp_tiny45_circuit.png'><img src='http://dorkbotpdx.org/files/teensy_avrisp_tiny45_circuit.png' width='500px'/></a>
+<a href='/files/teensy_avrisp_tiny45_circuit.png'><img src='/files/teensy_avrisp_tiny45_circuit.png' width='500px'/></a>
 
 <big><big><b>Please use this table for the connections:
 
@@ -47,7 +47,7 @@ Some notes:
 
 So then we build it.  We pull out a breadboard, connect up power and ground, and add the Teensy and ATTiny45.  We then make the above mentioned connections.  We think it looks good when it looks something like this:
 
-<a href='http://dorkbotpdx.org/files/teensy_avrisp_circuit.jpg'><img src='http://dorkbotpdx.org/files/teensy_avrisp_circuit.jpg' width='500px'/></a>
+<a href='/files/teensy_avrisp_circuit.jpg'><img src='/files/teensy_avrisp_circuit.jpg' width='500px'/></a>
 
 <h2>Trust nothing!</h2>
 Because we're cynical skeptics, we check all connections with our meter....
@@ -75,7 +75,7 @@ HTTP request sent, awaiting response... 200 OK
 Length: 1804 (1.8K) [text/plain]
 Saving to: `49-teensy.rules'
 
-100%[=========================================================================>] 1,804       --.-K/s   in 0.001s  
+100%[=========================================================================>] 1,804       --.-K/s   in 0.001s
 
 2012-01-12 22:10:20 (1.35 MB/s) - `49-teensy.rules' saved [1804/1804]
 
@@ -97,7 +97,7 @@ Starting the hotplug events dispatcher: udevd.
 <h2>Arduino</h2>
 We need the arduino software, so we go to <a href="http://arduino.cc/en/Main/Software">the arduino site</a> and grab the latest version:
 
-<blockquote><tt>$ wget http://arduino.googlecode.com/files/arduino-1.0-linux64.tgz                                                                   
+<blockquote><tt>$ wget http://arduino.googlecode.com/files/arduino-1.0-linux64.tgz
 --2012-01-12 22:21:09--  http://arduino.googlecode.com/files/arduino-1.0-linux64.tgz
 Resolving arduino.googlecode.com (arduino.googlecode.com)... 74.125.127.82
 Connecting to arduino.googlecode.com (arduino.googlecode.com)|74.125.127.82|:80... connected.
@@ -105,20 +105,20 @@ HTTP request sent, awaiting response... 200 OK
 Length: 4351508 (4.1M) [application/x-gzip]
 Saving to: `arduino-1.0-linux64.tgz'
 
-100%[===========================================================================================>] 4,351,508    308K/s   in 17s     
+100%[===========================================================================================>] 4,351,508    308K/s   in 17s
 
 2012-01-12 22:21:26 (248 KB/s) - `arduino-1.0-linux64.tgz' saved [4351508/4351508]
 </tt></blockquote>
 
 And then we extract the tarball:
 
-<blockquote><tt>$ tar -xzf arduino-1.0-linux64.tgz 
+<blockquote><tt>$ tar -xzf arduino-1.0-linux64.tgz
 </tt></blockquote>
 
 <h2>Teensyduino</h2>
 In order to program for and to program the Teensy, we need <a href="http://pjrc.com/teensy/teensyduino.html">Teensyduino</a>, a software add-on to the Arduino IDE.  We <a href="http://pjrc.com/teensy/td_download.html">download the latest version from PJRC</a>:
 
-<blockquote><tt>$ wget http://pjrc.com/teensy/td_107/teensyduino.64bit                                                                               
+<blockquote><tt>$ wget http://pjrc.com/teensy/td_107/teensyduino.64bit
 --2012-01-12 22:27:49--  http://pjrc.com/teensy/td_107/teensyduino.64bit
 Resolving pjrc.com (pjrc.com)... 67.19.59.50
 Connecting to pjrc.com (pjrc.com)|67.19.59.50|:80... connected.
@@ -126,7 +126,7 @@ HTTP request sent, awaiting response... 200 OK
 Length: 2780140 (2.7M) [text/plain]
 Saving to: `teensyduino.64bit'
 
-100%[===========================================================================================>] 2,780,140    309K/s   in 11s     
+100%[===========================================================================================>] 2,780,140    309K/s   in 11s
 
 2012-01-12 22:28:00 (254 KB/s) - `teensyduino.64bit' saved [2780140/2780140]
 </tt></blockquote>
@@ -140,16 +140,16 @@ and then we install it by running it:
 sadly it's a graphical installer, so we get to click through some screens:
 
 Click next:
-<a href='http://dorkbotpdx.org/files/teensyduino_installer1.png'><img src='http://dorkbotpdx.org/files/teensyduino_installer1.png' width='200px'/></a>
+<a href='/files/teensyduino_installer1.png'><img src='/files/teensyduino_installer1.png' width='200px'/></a>
 
 Enter in the path where you extracted the Arduino IDE (above):
-<a href='http://dorkbotpdx.org/files/teensyduino_installer2.png'><img src='http://dorkbotpdx.org/files/teensyduino_installer2.png' width='200px'/></a>
+<a href='/files/teensyduino_installer2.png'><img src='/files/teensyduino_installer2.png' width='200px'/></a>
 
 Click All (it's small and hard drives are big), then Next:
-<a href='http://dorkbotpdx.org/files/teensyduino_installer3.png'><img src='http://dorkbotpdx.org/files/teensyduino_installer3.png' width='200px'/></a>
+<a href='/files/teensyduino_installer3.png'><img src='/files/teensyduino_installer3.png' width='200px'/></a>
 
 After the progress bars flutter, you should see a screen like this:
-<a href='http://dorkbotpdx.org/files/teensyduino_installer4.png'><img src='http://dorkbotpdx.org/files/teensyduino_installer4.png' width='200px'/></a>
+<a href='/files/teensyduino_installer4.png'><img src='/files/teensyduino_installer4.png' width='200px'/></a>
 
 <h2>Installing the ArduinoISP firmware</h2>
 
@@ -162,10 +162,10 @@ Launch the arduino IDE:
 And then choose File -> Examples -> ArduinoISP from the menu.
 
 Click on the "upload" icon to compile the project and upload the firmware to the Teensy:
-<a href='http://dorkbotpdx.org/files/upload-to-teensy-from-arduino-ide.png'><img src='http://dorkbotpdx.org/files/upload-to-teensy-from-arduino-ide.png'/></a>
+<a href='/files/upload-to-teensy-from-arduino-ide.png'><img src='/files/upload-to-teensy-from-arduino-ide.png'/></a>
 
 the ArduinoIDE/Teensyduino will launch the Teensy loader.  It will display some stuff (loading/reboot ok) before showing the default loader screen:
-<a href='http://dorkbotpdx.org/files/teensy-loader.png'><img src='http://dorkbotpdx.org/files/teensy-loader.png'/></a>
+<a href='/files/teensy-loader.png'><img src='/files/teensy-loader.png'/></a>
 
 At this point, the Teensy should now be running the ArduinoISP firmware and should be capable of programming an ATTiny45 (and a bunch of others!)
 
@@ -175,11 +175,11 @@ GREAT SUCCESS!  So far we think we're good.
 
 <h2>Let's Program the Tiny45 - Take 1</h2>
 
-Since the original goal (if you've forgotten by now) was to program the ATTiny45, let's try doing that. 
+Since the original goal (if you've forgotten by now) was to program the ATTiny45, let's try doing that.
 
 We compile a small program for the Tiny45 (using avr-gcc, documented elsewhere) and attempt to upload the .hex file using avrdude:
 
-<blockquote><tt>$ avrdude -p t45 -c arduino -P /dev/ttyACM0 -U flash:w:servo.hex:i                                                          
+<blockquote><tt>$ avrdude -p t45 -c arduino -P /dev/ttyACM0 -U flash:w:servo.hex:i
 
 avrdude: please define PAGEL and BS2 signals in the configuration file for part ATtiny45
 avrdude: AVR device initialized and ready to accept instructions
@@ -201,7 +201,7 @@ avrdude: stk500_cmd(): programmer is out of sync</span>
 
 The above text in red indicates that we have failed.  I wonder if we can read the contents of the Tiny45?
 
-<blockquote><tt>$ avrdude -p t45 -c arduino -P /dev/ttyACM0 -U flash:r:/tmp/dump.hex:i                                                        
+<blockquote><tt>$ avrdude -p t45 -c arduino -P /dev/ttyACM0 -U flash:r:/tmp/dump.hex:i
 
 avrdude: please define PAGEL and BS2 signals in the configuration file for part ATtiny45
 avrdude: AVR device initialized and ready to accept instructions

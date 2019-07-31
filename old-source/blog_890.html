@@ -4,43 +4,43 @@ paul
 
 Last week I wrote firmware to control el wires by MIDI.
 
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_1.jpg">
+<img src="/files/images/midi_el_wire_1.jpg">
 
 <a href="http://www.handeyesupply.com/pages/portland">Hand-Eye Supply</a> will be using it for their float in this year's <a href="http://www.rosefestival.org/events/starlightparade/">Starlight Parade</a>.
 
 "Read more" for details....
 
 <!--break-->
-<a href="http://www.dorkbotpdx.org/blog/paul/hand_eye_supplys_starlight_parade_float_wins_award">Last year's float</a> was controlled by the Vixen X-mas lighting software.  This year, Laurence wants to make the float interactively respond to sounds.  Tobias investigated different software and found excellent sound processing software, but no way to interface it to Vixen or last year's firmware using Renard protocol.  All sound processing software works with MIDI, so I decided to reprogram the controllers.
+<a href="/blog/paul/hand_eye_supplys_starlight_parade_float_wins_award">Last year's float</a> was controlled by the Vixen X-mas lighting software.  This year, Laurence wants to make the float interactively respond to sounds.  Tobias investigated different software and found excellent sound processing software, but no way to interface it to Vixen or last year's firmware using Renard protocol.  All sound processing software works with MIDI, so I decided to reprogram the controllers.
 
 I wrote the MIDI firmware last week, just in time for their <a href="http://www.core77.com/blog/events/hand-eye_supply_announces_its_maker_overlords_for_2012_22451.asp">float kick-off party</a> where the announce the winners of a contest for who will ride on the float.  Lots of pictures and info on that Core77 page.  This blog is about the technical details, making the el wires respond to MIDI control this year.
 
 The el wires are controlled by this modified Sparkfun el wire sequencer.
 
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_3.jpg">
+<img src="/files/images/midi_el_wire_3.jpg">
 
-This is the same board that had <a href="http://www.dorkbotpdx.org/blog/paul/sparkfun_el_sequencer_trouble">many problems last year</a>.  You can see in the photo 3 of the triacs blew on this board and were replaced with TO-92 through hole versions.
+This is the same board that had <a href="/blog/paul/sparkfun_el_sequencer_trouble">many problems last year</a>.  You can see in the photo 3 of the triacs blew on this board and were replaced with TO-92 through hole versions.
 
 Here are Laurence Sarrazin and Tobias Berblinger reprogramming the sequencers, while Kathryn tries "playing" the lights.
 
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_2.jpg">
+<img src="/files/images/midi_el_wire_2.jpg">
 
 The float runs on 15 sequencers, with 5 plexiglass panels having 3 sequencers and 3 cool neon "big boy" inverters per panel.
 
 Here is the actual hardware I built for this year.
 
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_4.jpg">
+<img src="/files/images/midi_el_wire_4.jpg">
 
 There's no microcontroller.  It just takes MIDI IN, goes through an opto-coupler, and then buffers the signal.  Most of the space is a simple linear regulator to make 5 volts to send to the sequencers.  Here's a schematic:
 
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_sch.jpg">
-Here's a <a href="http://www.dorkbotpdx.org/files/images/midi_el_wire_sch.big.jpg">hi-res copy</a>.
+<img src="/files/images/midi_el_wire_sch.jpg">
+Here's a <a href="/files/images/midi_el_wire_sch.big.jpg">hi-res copy</a>.
 
 An important point is the 4.7K resistors in the cable.  The sequencers have AVR chips running at 3.3 volts, so these resistors prevent the 5 volt signal from damaging them.
 
 The same signal goes to all 15 boards.  Jumpers on the edge of the board configure which 8 notes each board will "play".
 
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_jumpers.png">
+<img src="/files/images/midi_el_wire_jumpers.png">
 
 The firmware only listens for MIDI channel #1.  It is "velocity sensitive", with the following code:
 
@@ -59,14 +59,14 @@ uint8_t midi2intensity(uint8_t velocity)
 }
 </pre>
 
-Intensity 8 corresponds to fully on.  Lower numbers, from 1 to 7, output PWM-like drive to the triacs for dimming. 
+Intensity 8 corresponds to fully on.  Lower numbers, from 1 to 7, output PWM-like drive to the triacs for dimming.
 
 The idea behind these scalings is most of the MIDI velocity range will make the el wires fully illuminate.  El wire isn't terribly bright anyway.  But if someday dimming effects are desired, that low section of the range can be used (without having to reprogram all 15 boards again).
-  
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_5.jpg">
-  
+
+<img src="/files/images/midi_el_wire_5.jpg">
+
 Unfortunately, the Sparkfun sequencer lacks any information about the phase of the AC waveform to the el wire, so the pulses must be many cycles instead of switching individual cycles (you don't want to do fractional-cycle dimming, as would be done on resistive or inductive loads).  The lowest couple intensities sometimes flicker as a result.
 
-<img src="http://www.dorkbotpdx.org/files/images/midi_el_wire_6.jpg">
+<img src="/files/images/midi_el_wire_6.jpg">
 
 Here is the source code which runs on those sequencer boards.

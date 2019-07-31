@@ -2,8 +2,8 @@ Txtzyme Javascope Feeds Java's 2D Graphics
 2010-06-13 09:28:02
 WardCunningham
 
-<p>In my last post I described plotting <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> output with a <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/plotting_signals_with_txtzyme">perl one-liner</a>. I wondered, can I do better with a real graphics library? I was looking for something portable, like GD, but chose the already installed Graphics2D in Java 5 for convenience.</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/TxtzymeJavascope.png'/></p>
+<p>In my last post I described plotting <a rel="nofollow" class="external text" href="/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> output with a <a rel="nofollow" class="external text" href="/blog/wardcunningham/plotting_signals_with_txtzyme">perl one-liner</a>. I wondered, can I do better with a real graphics library? I was looking for something portable, like GD, but chose the already installed Graphics2D in Java 5 for convenience.</p>
+<p><img alt='img' src='/files/images/TxtzymeJavascope.png'/></p>
 <p>As a once Tektronix engineer I have strong opinions about what a waveform should look like. I'm pleased with the look I get with Graphics2D. I would have never thought that the joint and end-cap choices would matter, but they do, and anti-aliasing is a must also.</p>
 <p>Once Scope.java is running and listening to a Teensy, one has only to send data-generating Txtzyme nano-programs down the other way to light the screen with waveforms.</p>
 <p>Here is an included script called Timebase.sh that does exactly this, alternating between real-time and equivalent-time acquisition of my favorite source, 60Hz hum.</p>

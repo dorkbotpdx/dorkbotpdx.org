@@ -3,7 +3,7 @@ My first PCB project
 scott_d
 
 <p>So have you ever wanted to use one of the ubiquitous 16 pin LCDs in a project but found it a pain to wire up all the signals (not to mention the pot for contrast control and maybe a backlight control as well)? Me too. Sure there are serial backpacks and other ways to cut down on the number of pins and connections that it takes to run the LCD but sometimes that seems like overkill for a simple one-off project.</p>
-<p>When I took Don's Eagle class I needed a good small project to start off with. We were allowed 2 square inches on the DorkbotPDX <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/laen/pcb_group_order_2">PCB group order</a> and it seemed like this would be a perfect opportunity to come up with a good solution to the LCD problem. So I decided to generate a design which is basically a Dorkboard on an expanded layout with the necessary header, connections and discrete components to drive the usual 16 pin LCD displays based on the Hitachi HD44780 and compatible controllers (including backlight PWM control). The Eagle files are attached as is a schematic image. It incorporates a new layout of Don's Dorkboard circuit. I left out a couple of features of his design: the pin 13 LED (which I didn't really want blinking away behind the LCD) and the optional DTR autoreset capacitor, which I didn't need since the USB-serial programmers I use (like the Benito) handle the reset pulse in other ways.</p>
+<p>When I took Don's Eagle class I needed a good small project to start off with. We were allowed 2 square inches on the DorkbotPDX <a rel="nofollow" class="external text" href="/blog/laen/pcb_group_order_2">PCB group order</a> and it seemed like this would be a perfect opportunity to come up with a good solution to the LCD problem. So I decided to generate a design which is basically a Dorkboard on an expanded layout with the necessary header, connections and discrete components to drive the usual 16 pin LCD displays based on the Hitachi HD44780 and compatible controllers (including backlight PWM control). The Eagle files are attached as is a schematic image. It incorporates a new layout of Don's Dorkboard circuit. I left out a couple of features of his design: the pin 13 LED (which I didn't really want blinking away behind the LCD) and the optional DTR autoreset capacitor, which I didn't need since the USB-serial programmers I use (like the Benito) handle the reset pulse in other ways.</p>
 <p>The idea was that you would then have a board which could be used as a Dorkboard (Arduino compatible except for the missing LED) but with the ability to easily plug in an LCD for a nice compact package. You can drive it with the <a rel="nofollow" class="external text" href="http://arduino.cc/en/Reference/LiquidCrystal">LiquidCrystal library</a> which comes standard with the Arduino software. In addition, since serial and I2C lines are brought out on the board, you could use the board + LCD as a serial display to another processor if you needed more processor power or additional I/O pins.</p>
 <p>The resulting board: <img alt='img' src='http://farm5.static.flickr.com/4042/4216226949_9a74471bce_m.jpg'/></p>
 <p>First one built out: <img alt='img' src='http://farm5.static.flickr.com/4052/4216227047_8b52a51242_m.jpg'/></p>
@@ -40,11 +40,11 @@ scott_d
 <p><code>}</code></p>
 <p><code>void loop() {</code></p>
 <pre>
-<code>// scroll 13 positions (string length) to the left 
+<code>// scroll 13 positions (string length) to the left
   // to move it offscreen left:
   for (int positionCounter = 0; positionCounter &lt; 13; positionCounter++) {
     // scroll one position left:
-    lcd.scrollDisplayLeft(); 
+    lcd.scrollDisplayLeft();
     // wait a bit:
     delay(150);
   }
@@ -52,7 +52,7 @@ scott_d
   // to move it offscreen right:
   for (int positionCounter = 0; positionCounter &lt; 29; positionCounter++) {
     // scroll one position right:
-    lcd.scrollDisplayRight(); 
+    lcd.scrollDisplayRight();
     // wait a bit:
     delay(150);
   }
@@ -60,7 +60,7 @@ scott_d
     // to move it back to center:
   for (int positionCounter = 0; positionCounter &lt; 16; positionCounter++) {
     // scroll one position left:
-    lcd.scrollDisplayLeft(); 
+    lcd.scrollDisplayLeft();
     // wait a bit:
     delay(150);
   }

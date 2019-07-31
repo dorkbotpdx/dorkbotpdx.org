@@ -2,7 +2,7 @@ Pre-Built Txtzyme Hex Files and More
 2010-07-25 13:26:05
 WardCunningham
 
-<p>I've pre-built hex files for the standard <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> interpreter. In this post I show you where to find them and where to find a longish but still simple Txtzyme program to run on it.</p>
+<p>I've pre-built hex files for the standard <a rel="nofollow" class="external text" href="/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> interpreter. In this post I show you where to find them and where to find a longish but still simple Txtzyme program to run on it.</p>
 <p>Choose the download for your Teensy:</p>
 <ul>
 <li><a rel="nofollow" class="external text" href="http://github.com/WardCunningham/Txtzyme/raw/master/hex/at90usb162.hex">Teensy 1.0</a></li>
@@ -23,7 +23,7 @@ WardCunningham
 </ul>
 <p>I've refined this a little so that Txtzyme also generates a tone while it blinks. The attached file (morse.txt) contains generated commands you can send straight to your Teensy. Here is a shell one-liner to do it:</p>
 <dl>
-<dd>curl <a rel="nofollow" class="external free" href="http://dorkbotpdx.org/files/morse.txt">http://dorkbotpdx.org/files/morse.txt</a> &gt;/dev/cu.usbmodem12341</dd>
+<dd>curl <a rel="nofollow" class="external free" href="/files/morse.txt">/files/morse.txt</a> &gt;/dev/cu.usbmodem12341</dd>
 </dl>
 <p>Of course you will want to try different messages. Here is the <a rel="nofollow" class="external text" href="http://github.com/WardCunningham/Txtzyme/raw/master/projects/morse/morse.pl">perl program</a> I used to generate the attachment. Read more about the translation logic on the <a rel="nofollow" class="external text" href="http://github.com/WardCunningham/Txtzyme/tree/master/projects/morse/">Txtzyme Morse</a> project page.</p>
 

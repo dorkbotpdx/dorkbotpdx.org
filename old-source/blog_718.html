@@ -3,13 +3,13 @@ Photobot Takes and Shares Photos
 WardCunningham
 
 <p>As promised, I brought my tricked out robot to Monday's meeting with my digital SLR attached and a 365-degree scan of me looking through the viewfinder.</p>
-<p><a rel="nofollow" class="external autonumber" href="http://dorkbotpdx.org/files/images/IMG_1172.jpeg">[1]</a></p>
-<p>I hooked a Teensy up through the camera's <a rel="nofollow" class="external text" href="http://c2.com/cybords/wiki.cgi?HowToPhotography">remote control jack</a>. It's pull-to-ground signals are shared with the push-to-focus-shoot button on the camera. Here is the <a rel="nofollow" class="external text" href="http://dorkbotpdx.org/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> I included in the click.cgi script:</p>
+<p><a rel="nofollow" class="external autonumber" href="/files/images/IMG_1172.jpeg">[1]</a></p>
+<p>I hooked a Teensy up through the camera's <a rel="nofollow" class="external text" href="http://c2.com/cybords/wiki.cgi?HowToPhotography">remote control jack</a>. It's pull-to-ground signals are shared with the push-to-focus-shoot button on the camera. Here is the <a rel="nofollow" class="external text" href="/blog/wardcunningham/shell_programming_with_txtzyme">Txtzyme</a> I included in the click.cgi script:</p>
 <pre>
      1b0o 500m 0b0o 1500m 0bi 1bi
 </pre>
 <p>This says, focus, wait 1/2 second, shoot, wait 1-1/2 seconds, then tri-state to let the control lines go. Here is a typical result:</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/IMG_4605.preview.JPG'/></p>
+<p><img alt='img' src='/files/images/IMG_4605.preview.JPG'/></p>
 <p>An instance of Apache runs on Photobot to offer anyone on the LAN a dozen similar control scripts and a directory full of photos taken through the evening.</p>
 <p><br /></p>
 

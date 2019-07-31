@@ -5,7 +5,7 @@ emckee
 <p>First to resolve the primary issue from my last post: It turns out that, while 16 MHz operation of a dorkboard on 3.3v is outside the spec'd window, it still works. &#160;:) Lesson: When in doubt, try it! Worry about fixing it if it doesn't work.</p>
 <p>Next problem: odd data.</p>
 <p>I've hooked everything up: PSU to Dorkboard to accelerometer and logger. Using a bit of sample code from the Sparkfun.com website, I've managed to collect data from the device. However, whenever the accel is oriented such that a positive axis is up, there is an odd echo to that axis (see first image, above). The odd bit is that the echo goes away (or rather, I don't see a positive echo) when that axis is oriented in the negative (down) direction.</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/Data%20Echo_0.jpg'/></p>
+<p><img alt='img' src='/files/images/Data%20Echo_0.jpg'/></p>
 <p>A brief description of what's going on here: When the relevant axis (Z here) is oriented in a neutral direction, the accelerometer reading should be ~0. When it is pointed up, it is accelerated against gravity (ie, I'm holding it up), so the value should be ~128. When pointed down, the value should be ~-128. So in this chart, you can see that it starts out pointed up, moves to neutral, up, neutral, down, and finally finishes up. Whenever it points up, the negative echo is observed.</p>
 <p>Looking at the code:</p>
 <p>...[snip]...</p>
@@ -23,7 +23,7 @@ emckee
 </pre>
 <p>...[snip]...</p>
 <p>After talking with folks at Monday's meeting, the consensus is that there is a data conversion problem. Indeed, the comments on Sparkfun's website indicate that there is a bug in the program as well, regarding the way the data is stored and whether or not it is signed.</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/X-axis%20accel%20data%20attempt%202.jpg'/></p>
+<p><img alt='img' src='/files/images/X-axis%20accel%20data%20attempt%202.jpg'/></p>
 <p>I first attempted to use the solution proposed on the sparkfun comments. This removed the observed echo, but created significant other noise on the graph that it was almost equally unusable (see right).</p>
 <p>After playing around with it some more, I think I may have found a solution. I believe the problem may be with the order in which operations are performed on the data from the accelerometer registers. I think that most of the noise can be eliminated by performing the bitshift and bit-wise OR first, then converting the result to an integer format. So...</p>
 <p>...[snip]...</p>
@@ -44,6 +44,6 @@ emckee
 </pre>
 <p>...[snip]...</p>
 <p>The data certainly looks better (see below)! At least the remainder of the noise, I think I can clean up with a software filter... Please let me know what you think might be going on here, and if this is the best solution to the issue. &#160;:)</p>
-<p><img alt='img' src='http://dorkbotpdx.org/files/images/X-axis%20accel%20data%20attempt%203.jpg'/></p>
+<p><img alt='img' src='/files/images/X-axis%20accel%20data%20attempt%203.jpg'/></p>
 <p>-e</p>
 

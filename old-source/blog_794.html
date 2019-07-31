@@ -4,9 +4,9 @@ paul
 
 Recently I built electronics for <a href="http://www.facebook.com/lostmachine">Lostmachine Andy</a>'s fire effects on his awesome <a href="http://www.lostmachine.com/blog/">pirate ship</a> for Burning Man.
 
-<center><img src="http://www.dorkbotpdx.org/files/images/pirateshipfire1.jpg"></center>
+<center><img src="/files/images/pirateshipfire1.jpg"></center>
 
-<center><img src="http://www.dorkbotpdx.org/files/images/pirateshipfire_concept.jpg"></center>
+<center><img src="/files/images/pirateshipfire_concept.jpg"></center>
 
 "Read more" for technical details....
 
@@ -20,26 +20,26 @@ Here is a video where 1 of the 8 fire nozzels was tested in Andy's driveway!
 
 My little piece of this huge project is the circuit board, which you can see in the center of this nice metal box Andy machined.
 
-<img src="http://www.dorkbotpdx.org/files/images/pirateshipfire2.jpg">
+<img src="/files/images/pirateshipfire2.jpg">
 
 Here are images of the circuit board.
 
-<img src="http://www.dorkbotpdx.org/files/images/valvesw_top.png">
+<img src="/files/images/valvesw_top.png">
 
 
 The 8 solenoid valves connect on the top edge.  Eight manual fire pushbuttons connect on the bottom edge.  Those pushbuttons directly turn on the transistor for each valve.  Of course, the software running on a Teensy 2.0 can control the valves too.  There's inputs for 4 buttons and 2 knobs to the software.  There's a place to plug in a 16x2 LCD, which shows info about the sequence to be used.
 
-<img src="http://www.dorkbotpdx.org/files/images/valvesw_bottom.png">
+<img src="/files/images/valvesw_bottom.png">
 
 Circuitry-wise, the board is pretty simple.  There's a big P-channel mosfet at the input, acting as a diode to protect against reverse polarity power.  Each valve draws about 1.5 amps, so at 12 amps, a regular diode didn't seem like a good idea.  In the center is a Teensy 2.0 board in sockets, and to the right is a LM7805 regulator.  The 5 volt power to the 2 knobs goes through little PTC fuses.  The knobs and buttons just wire into analog and digital pins, through some little R-C filters, just in case there's any radio frequency noise pickup.  Since I'm not going to Burning Man this year and can't be there to troubleshoot, I wanted to play it safe (and it only takes a few extra cheap parts).
 
 On the top edge are the 8 transistor circuits.  There too, I decided to play things safe, perhaps a bit overly cautious?  The valves are switched with IRFR5305 P-channel mosfets.  Rated at 31 amps, 55 volts, they're a bit overkill.  Then again, I wanted to make sure they wouldn't get hot, so their on resistance of 0.065 ohms is nice.  At 1.5 amps, that ought to be 0.15 watts, which isn't much at all for a package with a metal tab.  A lesser transistor would have worked, but might have needed a heatsink.  This PCB was made at Sunstone and just barely fit into 9 square inches.  Using heatsinks would have bumped the cost up to the next bracket, which is a lot more than the cost of these nicer transistors.
 
-<img src="http://www.dorkbotpdx.org/files/images/pirateshipfire3.jpg">
+<img src="/files/images/pirateshipfire3.jpg">
 
 Andy was concerned about the valves switching quickly.  So for the back-EMF catch diode, I used a B130 schottky in series with a 12 volt, 3 watt zener.  That lets the valve create -12 volts while discharging, so it ought to switch from on-to-off about as far as off-to-on.  We talked a bit about possibly using a very complex approach where the valves might be driven with about 50 volts until they get up to the correct current, and then sustain at the rated 12 volts.  Yes, that's risky, but I'm pretty sure I could do it safely.  Maybe after the burn this year we'll be able to play with the valves and experiment to see if forcing the valve to open and close faster than it can with only 12 volts actually allows any interesting fire effects?
 
-<img src="http://www.dorkbotpdx.org/files/images/pirateshipfire_sch.png">
+<img src="/files/images/pirateshipfire_sch.png">
 
 A couple extra overly cautious things I did do were resistors to slow down the gate drive into the microseconds range (still far faster than any mechanical valve can move), and just to be extra cautious, I put a tiny R-C snubber on the output, just in case the transistor somehow switches faster that the reverse recovery time of those diodes.  I guess over an amp of current flowing in an almost purely inductive load makes me a bit nervous.  Those parts probably aren't necessary and the 2 diodes are probably all the protection necessary from inductive spikes... but I wanted to play it extra safe since things are so hard to fix out on the playa at Burning Man (especially at night, when the fire will be in use).
 
@@ -302,7 +302,7 @@ While this code is fairly long, and a bit complex in the custom delay and other 
 &nbsp;&nbsp;<span style="color: #CC6600;">byte</span> prev2 = 101;
 &nbsp;&nbsp;<span style="color: #CC6600;">byte</span> myValve1 = 102;
 &nbsp;&nbsp;<span style="color: #CC6600;">byte</span> myValve2 = 103;
-&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">byte</span> i=0; i&lt;20; i++) { 
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">byte</span> i=0; i&lt;20; i++) {
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">while</span> (myValve1 == prev1 || myValve1 == prev2 || myValve2 == prev1 || myValve2 == prev2) {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myValve1&nbsp;=&nbsp;valvelist[<span style="color: #CC6600;">random</span>(0, 8)];
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myValve2&nbsp;=&nbsp;myValve1;
@@ -473,7 +473,7 @@ While this code is fairly long, and a bit complex in the custom delay and other 
 &nbsp;&nbsp;}
 &nbsp;&nbsp;<span style="color: #CC6600;">if</span> (num != prev_num) {
 &nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">setCursor</span>(0, 0);
-&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(name); 
+&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(name);
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">for</span> (<span style="color: #CC6600;">int</span> i=strlen(name); i &lt; 16; i++) {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">' '</span>);
 &nbsp;&nbsp;&nbsp;&nbsp;}
@@ -517,7 +517,7 @@ While this code is fairly long, and a bit complex in the custom delay and other 
 &nbsp;&nbsp;&nbsp;&nbsp;prev_knob_reading&nbsp;=&nbsp;-100;
 &nbsp;&nbsp;}
 &nbsp;&nbsp;
-&nbsp;&nbsp;<span style="color: #CC6600;">delay</span>(10); 
+&nbsp;&nbsp;<span style="color: #CC6600;">delay</span>(10);
 }
 
 
@@ -533,10 +533,10 @@ While this code is fairly long, and a bit complex in the custom delay and other 
 &nbsp;&nbsp;<span style="color: #CC6600;">static</span> <span style="color: #CC6600;">byte</span> knob_speed = 1;
 &nbsp;&nbsp;<span style="color: #CC6600;">int</span> knob_reading = <span style="color: #CC6600;">analogRead</span>(speed_knob_pin);
 &nbsp;&nbsp;<span style="color: #CC6600;">if</span> (knob_reading &lt; prev_knob_reading - 2 || knob_reading &gt; prev_knob_reading + 2) {
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">setCursor</span>(0, 1);   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">setCursor</span>(0, 1);
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">"Speed:"</span>);
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;knob_speed&nbsp;=&nbsp;(knob_reading&nbsp;/&nbsp;94)&nbsp;+&nbsp;1;&nbsp;&nbsp;<span style="color: #7E7E7E;">// range is 1 to 11</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>((<span style="color: #CC6600;">int</span>)knob_speed);  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lcd.<span style="color: #CC6600;">print</span>((<span style="color: #CC6600;">int</span>)knob_speed);
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">if</span> (knob_speed &lt; 10) lcd.<span style="color: #CC6600;">print</span>(<span style="color: #006699;">" "</span>);
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;prev_knob_reading&nbsp;=&nbsp;knob_reading;
 &nbsp;&nbsp;}
@@ -571,7 +571,7 @@ While this code is fairly long, and a bit complex in the custom delay and other 
 
 The last bit of technical info to share is the PCB gerber files, which were sent to Sunstone.  The files are attached below.
 
-<img src="http://www.dorkbotpdx.org/files/images/valvesw_pcb.png">
+<img src="/files/images/valvesw_pcb.png">
 
 If you use these files, please be aware 1 small error was discovered.  The power for the LCD was mistakenly connected to +12 volts.  If you use a LCD, you must cut that trace and solder a wire to the +5 volt output of the LM7805.  Other that that 1 error, the board works great.
 
