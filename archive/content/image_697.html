@@ -1,9 +1,0 @@
-5V to 12V bidirectional level converter
-2011-02-09 19:44:25
-SiliconFarmer
-
-<p>The arrangement of a MOSFET and two pullup resistors in this circuit is often found on I2C busses that need level conversion. The pushbutton and transistor have been added to show how it could fit into a project by David Madden.</p>
-<p>Either side can pull both sides low. Both sides have pullups, so if neither is pulling low, both go to their power rail.</p>
-<p>The N-channel MOSFET isolates the power rail voltages. Note that the lower voltage signal must be on the source, the higher voltage on the drain. It is also OK for both supply voltages to be the same.</p>
-<p>The limitation is speed. Depending on the parasitic capacitances in the implementation, speeds of 100KHz may be achieved.</p>
-
