@@ -41,6 +41,10 @@
 .no-m {
     margin: 0;
 }
+body {
+    background-color: #ffffff;
+}
+
 #svg-container, #text-container {
     position: absolute;
     width: 480px;

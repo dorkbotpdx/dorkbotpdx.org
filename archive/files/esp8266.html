@@ -1,0 +1,161 @@
+<html>
+<head>
+<style type="text/css">
+
+body {
+  background: black;
+}
+
+#content {
+  /* Relative position required for clipping */
+  position: relative;
+  width: 480px;
+  height: 480px;
+  overflow: hidden;
+}
+
+#textdiv {
+  font-size: 1.5em;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  width:480px;
+  color: black;
+  opacity: 1.0;
+  mix-blend-mode: multiply;
+}
+
+@keyframes moveIt {
+  0% {
+    left: 100px;
+    top: -300px;
+
+  }
+  90% {
+    opacity: 0.65;
+  }
+  100% {
+    left: 100px;
+    top: 500px;
+    opacity: 0.0;
+  }
+}
+
+@keyframes moveIt2 {
+  0% {
+    left: 100px;
+    top: 500px;
+  }
+  90% {
+    opacity: 0.65;
+  }
+  100% {
+    left: 100px;
+    top: -300px;
+    opacity: 0.0;
+  }
+}
+
+.topleft {
+  animation-name: moveIt;
+  animation-duration: 5s;
+  animation-fill-mode: forwards;
+}
+
+.topright {
+  animation-name: moveIt2;
+  animation-duration: 5s;
+  animation-fill-mode: forwards;
+}
+
+</style>
+
+<script type="text/javascript">
+
+function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255)
+    };
+}
+
+function createCel() {
+  var iDiv = document.createElement('div');
+  var style = " \
+    position: absolute; \
+    top: 100px; \
+    left: 100px; \
+    height: 0px; \
+  ";
+  style += "border-left: " + (Math.random() * 100 + 50) + "px solid transparent;";
+  style += "border-right: " + (Math.random() * 100 + 50) + "px solid transparent;";
+  var color = HSVtoRGB(0.5 + Math.random() * 0.5, 1.0, 1.0);
+  var colorStr = "rgb(" + color.r + ", " + color.g + "," + color.b + ")";
+  style += "border-bottom: " + ((Math.random() * 150) + 200) + "px solid " + colorStr + ";";
+  style += "width: " + (Math.random() * 100 + 20) + "px;";
+  style += "transform: rotate(" + (Math.random() * 360) + "deg);";
+  style += "opacity: 0.65;";
+  console.log(style);
+  iDiv.style = style;
+  document.getElementById('zoids').appendChild(iDiv);
+  return iDiv;
+}
+
+var messages = [
+  "DORKBOTPDX & <br>CTRL-H",
+  "present a <br>workshop",
+  "on the <br>ESP8266",
+  "enables web interface",
+  "to your micro projects!"
+];
+
+var oldNodes = [];
+var lastIndex = 0;
+
+function nextMessage() {
+  if (lastIndex >= messages.length)
+    lastIndex = 0;
+  document.getElementById('textdiv').innerHTML = messages[lastIndex++];
+  createCel().className = 'topleft';
+  createCel().className = 'topright';
+}
+
+function start() {
+  nextMessage();
+  setInterval(function() {
+    nextMessage();
+  }, 6000);
+}
+
+
+
+</script>
+
+</head>
+
+<body onLoad="start();">
+<div id="content">
+  <div id="zoids"></div>
+  <div id="textdiv"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* ---------- Color Module Styles ----------- */
+
+body {
+  color: #3b3b3b;
+  background: #161617;
+}
+#page,
+#main-wrapper,
+.region-primary-menu .menu-item a.is-active,
+.region-primary-menu .menu-item--active-trail a {
+  background: #ffffff;
+}
+.tabs ul.primary li a.is-active {
+  background-color: #ffffff;
+}
+.tabs ul.primary li.is-active a {
+  background-color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+#header {
+  background-color: #4e4e4e;
+  background-image: -webkit-linear-gradient(top, #4a4a4a 0%, #4e4e4e 100%);
+  background-image: linear-gradient(to bottom, #4a4a4a 0%, #4e4e4e 100%);
+}
+a,
+.link {
+  color: #0072b6;
+}
+a:hover,
+a:focus,
+.link:hover,
+.link:focus {
+  color: #0090e4;
+}
+a:active,
+.link:active {
+  color: #24aeff;
+}
+.sidebar .block {
+  background-color: #ffffff;
+  border-color: #d0d0d0;
+}
+.site-footer {
+  background: #161617;
+}
+.region-header,
+.region-header a,
+.region-header li a.is-active,
+.site-branding__text,
+.site-branding,
+.site-branding__text a,
+.site-branding a,
+.region-secondary-menu .menu-item a,
+.region-secondary-menu .menu-item a.is-active {
+  color: #ffffff;
+}
+
+/* ---------- Color Form ----------- */
+
+[dir="rtl"] .color-form .color-palette {
+  margin-left: 0;
+  margin-right: 20px;
+}
+[dir="rtl"] .color-form .form-item label {
+  float: right;
+}
+[dir="rtl"] .color-form .color-palette .lock {
+  right: -20px;
+  left: 0;
+}

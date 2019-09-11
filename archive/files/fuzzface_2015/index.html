@@ -41,7 +41,7 @@
         margin-right: 25px;
       }
       #details-list {
- /*        position: absolute;
+/*        position: absolute;
         top: 410px; */
         padding-left: 10px;
         padding-right: 10px;
@@ -285,6 +285,7 @@ window.AudioContext = (function() {
 // Global Variables for Audio
 var audioContext;
 var sourceNode;
+var gainNode;
 var analyserNode;
 var javascriptNode;
 var sampleSize = 1024; // Every 1024 audio samples, the Analyser node triggers the Javascript node, which calls our graphics function that renders it.
@@ -348,12 +349,15 @@ function setupAudioNodes() {
 
   // Now connect the nodes together
   // sourceNode.connect(audioContext.destination);
+
   sourceNode.connect(javascriptNode);
   sourceNode.connect(distortion);
 
   distortion.connect(analyserNode);
-
-  distortion.connect(audioContext.destination);
+  gainNode = audioContext.createGain();
+  gainNode.gain.value = 0.0;
+  distortion.connect(gainNode);
+  gainNode.connect(audioContext.destination);
   javascriptNode.connect(audioContext.destination);
 }
 
@@ -385,6 +389,13 @@ function playSound(buffer) {
     //sourceNode.stop(0);
     audioPlaying = false;
   }
+}
+
+function toggleMute() {
+  if (gainNode.gain.value < 0.8)
+    gainNode.gain.value = 0.8
+  else
+    gainNode.gain.value = 0.0;
 }
 
 function makeDistortionCurve(amount) {
@@ -420,7 +431,8 @@ function onError(e) {
 	Build your own Fuzzface distortion guitar pedal clone while learning about the history and theory of analog electric guitar distortion. General principles of building analog guitar effects will also be discussed.
 
 <p>
-All parts will be provided for a working Fuzzface clone minus an enclosure. Please bring your own soldering tool, solder, wire cutters, and strippers. $30 fee covers cost of parts and PCB.
+All parts will be provided for a working Fuzzface clone minus an enclosure. Please bring your own soldering tool, solder, wire cutters, and strippers. $30 fee covers cost of parts and PCB. <a style="color: #ff0000" onclick="toggleMute();">Click here to rock!</a>
+</p>
 
   </div>
   <div id="details-list">
