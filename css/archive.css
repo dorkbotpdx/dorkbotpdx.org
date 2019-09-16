@@ -26,3 +26,25 @@ a {
  color: #FFFFFF;
  text-decoration: underline;
 }
+
+div.indexline {
+  margin-top: 1em;
+}
+
+div.title {
+  font-size: 150%;
+  margin-bottom: 10px;
+}
+
+div.author, div.datetime {
+  display: inline;
+  color: #aaaaaa;
+}
+
+div.author::before {
+  content: "By: "
+}
+
+div.datetime::before {
+  content: "on "
+}
