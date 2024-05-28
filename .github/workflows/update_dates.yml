@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: try and update index
         run: |
-          branch="automated/update-event-dates-$(date+%Y%m%d%H)"
+          branch="automated/update-event-dates-$(date +%Y%m%d%H)"
           git checkout -b $branch
           .github/scripts/update_dates.sh
       - name: create PR
