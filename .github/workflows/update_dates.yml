@@ -19,6 +19,8 @@ jobs:
           if git diff-index --quiet HEAD --; then
             echo "No chnages to the calendar right now."
           else
+            git config user.email "bot@dorkbotpdx.org"
+            git config user.name "DorkbotPDX Bot"
             git commit -am "New event dates added"
             git push --set-upstream origin $branch
             echo "HAVE_CHANGES=1" >> $GITHUB_OUTPUT
