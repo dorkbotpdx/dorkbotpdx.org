@@ -25,14 +25,10 @@ jobs:
           else
             git commit -am "New event dates added"
             git push --set-upstream origin $branch
-            echo "HAVE_CHANGES=1" >> $GITHUB_OUTPUT
+            echo "HAVE_CHANGES=1" >> $GITHUB_ENV
           fi
-  pr_if_changes:
-    runs-on: ubuntu-latest
-    needs: mangle
-    if: ${{needs.mangle.outputs.output1}} == 1
-    steps:
-      - name: create PR
+      - name: create PR if changes exist
+        if:  ${{ env.HAVE_CHANGES }} == 1
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
