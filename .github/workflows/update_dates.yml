@@ -1,0 +1,20 @@
+# Attempts to update dates on index.html from google ical
+name: Update index dates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 */4 * * *"
+
+jobs:
+  mangle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: try and update index
+        run: .github/scripts/update_dates.yml
+      - name: create PR
+        run: |
+          gh pr create --title "[automated] Calendar events updated" \
+                       --body "Upcoming meeting dates have been updated!" \
+                       --base main
