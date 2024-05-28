@@ -12,7 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: try and update index
-        run: .github/scripts/update_dates.sh
+        run: |
+          branch="automated/update-event-dates-$(date+%Y%m%d%H)"
+          git checkout -b $branch
+          .github/scripts/update_dates.sh
       - name: create PR
         env:
           GH_TOKEN: ${{ github.token }}
