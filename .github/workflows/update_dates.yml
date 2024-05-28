@@ -15,10 +15,9 @@ jobs:
         run: |
           git config user.email "bot@dorkbotpdx.org"
           git config user.name "DorkbotPDX Bot"
-          git fetch origin
       - name: try and update index
         run: |
-          branch="automated/update-event-dates-$(date +%Y%m%d%H)"
+          branch="automated/update-event-dates-$(date +%Y%m%d%H%M%S)"
           git checkout -b $branch
           .github/scripts/update_dates.sh
           if git diff-index --quiet HEAD --; then
