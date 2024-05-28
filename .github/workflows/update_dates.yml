@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: try and update index
-        run: .github/scripts/update_dates.yml
+        run: .github/scripts/update_dates.sh
       - name: create PR
         run: |
           gh pr create --title "[automated] Calendar events updated" \
