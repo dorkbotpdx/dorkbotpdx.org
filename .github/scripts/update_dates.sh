@@ -17,13 +17,13 @@ while read -r line ; do
   if [[ "$line" =~ ^DTSTART* ]] ; then
     T=$(echo $line | sed -e "s/^DTSTART://")
     F=$(echo "${T:0:4}-${T:4:2}-${T:6:2} ${T:9:2}:${T:11:2}:${T:13:2}${T:15:1}")
-    NOW=$(date '+%Y%m%d')
-    THEDATE=$(date '+%B %eth, %Y' -d "$F")
-    EVENTDATE=$(date '+%Y%m%d' -d "$F")
+    NOW=$(TZ=America/Los_Angeles date '+%Y%m%d')
+    THEDATE=$(TZ=America/Los_Angeles date '+%B %eth, %Y' -d "$F")
+    EVENTDATE=$(TZ=America/Los_Angeles date '+%Y%m%d' -d "$F")
   fi
   if [[ "$line" =~ ^SUMMARY* ]] ; then
     THENAME=$(echo $line | sed -e "s/^SUMMARY://")
-    NOW=$(date '+%Y%m%d')
+    NOW=$(TZ=America/Los_Angeles date '+%Y%m%d')
     if [[ "$EVENTDATE" > "$NOW" ]] || [[ "$EVENTDATE" == "$NOW" ]] ; then
       echo "$EVENTDATE $THEDATE - $THENAME" >> $TMPF
     fi
