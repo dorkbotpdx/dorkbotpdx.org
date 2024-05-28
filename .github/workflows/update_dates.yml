@@ -14,6 +14,8 @@ jobs:
       - name: try and update index
         run: .github/scripts/update_dates.sh
       - name: create PR
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh pr create --title "[automated] Calendar events updated" \
                        --body "Upcoming meeting dates have been updated!" \
