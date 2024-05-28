@@ -28,7 +28,7 @@ jobs:
             echo "HAVE_CHANGES=1" >> $GITHUB_ENV
           fi
       - name: create PR if changes exist
-        if:  ${{ env.HAVE_CHANGES }} == 1
+        if:  ${{ env.HAVE_CHANGES == 1 }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
