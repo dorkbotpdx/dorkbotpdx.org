@@ -9,6 +9,9 @@ on:
 jobs:
   mangle:
     runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push changes
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: set up git
@@ -28,11 +31,14 @@ jobs:
             git push --set-upstream origin $branch
             echo "HAVE_CHANGES=1" >> $GITHUB_ENV
           fi
+      # - name: create PR if changes exist
+      #   if:  ${{ env.HAVE_CHANGES == 1 }}
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #   run: |
+      #     gh pr create --title "[automated] Calendar events updated" \
+      #                  --body "Upcoming meeting dates have been updated!" \
+      #                  --base main
       - name: create PR if changes exist
         if:  ${{ env.HAVE_CHANGES == 1 }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr create --title "[automated] Calendar events updated" \
-                       --body "Upcoming meeting dates have been updated!" \
-                       --base main
+        uses: stefanzweifel/git-auto-commit-action@v5
