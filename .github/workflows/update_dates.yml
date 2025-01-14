@@ -20,26 +20,14 @@ jobs:
           git config user.name "DorkbotPDX Bot"
       - name: try and update index
         run: |
-          # branch="automated/update-event-dates-$(date +%Y%m%d%H%M%S)"
-          # git checkout -b $branch
           .github/scripts/update_dates.sh
           git diff
           if git diff-index --quiet HEAD --; then
             echo "No changes to the calendar right now."
           else
             echo "There are changes!"
-            # git commit -am "New event dates added"
-            # git push --set-upstream origin $branch
             echo "HAVE_CHANGES=1" >> $GITHUB_ENV
           fi
-      # - name: create PR if changes exist
-      #   if:  ${{ env.HAVE_CHANGES == 1 }}
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #   run: |
-      #     gh pr create --title "[automated] Calendar events updated" \
-      #                  --body "Upcoming meeting dates have been updated!" \
-      #                  --base main
       - name: create PR if changes exist
         if:  ${{ env.HAVE_CHANGES == 1 }}
         uses: stefanzweifel/git-auto-commit-action@v5
