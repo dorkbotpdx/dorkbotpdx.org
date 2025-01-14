@@ -19,9 +19,9 @@ while read -r line ; do
     F=$(echo "${T:0:4}-${T:4:2}-${T:6:2} ${T:9:2}:${T:11:2}:${T:13:2}${T:15:1}")
     echo here1
     NOW=$(TZ=America/Los_Angeles date '+%Y%m%d')
-    echo here2
+    echo here2 $F
     THEDATE=$(TZ=America/Los_Angeles date '+%B %eth, %Y' -d "$F")
-    echo here3
+    echo here3 $F
     EVENTDATE=$(TZ=America/Los_Angeles date '+%Y%m%d' -d "$F")
     echo here4
   fi
