@@ -20,15 +20,16 @@ jobs:
           git config user.name "DorkbotPDX Bot"
       - name: try and update index
         run: |
-          branch="automated/update-event-dates-$(date +%Y%m%d%H%M%S)"
-          git checkout -b $branch
+          # branch="automated/update-event-dates-$(date +%Y%m%d%H%M%S)"
+          # git checkout -b $branch
           .github/scripts/update_dates.sh
           git diff
           if git diff-index --quiet HEAD --; then
             echo "No changes to the calendar right now."
           else
-            git commit -am "New event dates added"
-            git push --set-upstream origin $branch
+            echo "There are changes!"
+            # git commit -am "New event dates added"
+            # git push --set-upstream origin $branch
             echo "HAVE_CHANGES=1" >> $GITHUB_ENV
           fi
       # - name: create PR if changes exist
