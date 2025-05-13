@@ -31,3 +31,13 @@ jobs:
       - name: create PR if changes exist
         if:  ${{ env.HAVE_CHANGES == 1 }}
         uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Upload artifact
+        if:  ${{ env.HAVE_CHANGES == 1 }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        if:  ${{ env.HAVE_CHANGES == 1 }}
+        id: deployment
+        uses: actions/deploy-pages@v4
